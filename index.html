@@ -25,7 +25,7 @@
   input:focus,select:focus{border-color:var(--accent);}
   input::placeholder{color:#444;}
   select option{background:#1f1f1f;}
-  .api-note{background:rgba(184,255,87,.06);border:1px solid rgba(184,255,87,.2);border-radius:6px;padding:12px 16px;font-size:11px;color:#aaa;margin-bottom:14px;line-height:1.8;}
+  .api-note{background:rgba(184,255,87,.06);border:1px solid rgba(184,255,87,.2);border-radius:6px;padding:12px 16px;font-size:11px;color:#aaa;margin-bottom:14px;line-height:1.9;}
   .api-note a{color:var(--accent);text-decoration:none;}
   .api-note strong{color:var(--accent);}
   .btn{background:var(--accent);color:#000;border:none;border-radius:6px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:12px 28px;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.04em;}
@@ -80,9 +80,10 @@
   <div class="card">
     <div class="card-title">Configuration</div>
     <div class="api-note">
-      Requires a Google API key with <strong>Geocoding API</strong> and <strong>Places API (New)</strong> enabled in
-      <a href="https://console.cloud.google.com/apis/library" target="_blank">Google Cloud Console</a>.
-      Billing must be active (free tier is generous).
+      Requires a Google API key with these enabled in
+      <a href="https://console.cloud.google.com/apis/library" target="_blank">Google Cloud Console</a>:<br>
+      ✅ <strong>Places API (New)</strong> &nbsp;&nbsp; ✅ <strong>Geocoding API</strong><br>
+      Billing must be activated on your project (free tier covers thousands of searches/month).
     </div>
     <div class="form-grid">
       <div class="form-group" style="grid-column:1/-1;">
@@ -91,7 +92,7 @@
       </div>
       <div class="form-group">
         <label>Location</label>
-        <input type="text" id="location" placeholder="e.g. Shoreditch, London" value="London, UK">
+        <input type="text" id="location" placeholder="e.g. London, UK" value="London, UK">
       </div>
       <div class="form-group">
         <label>Business Type</label>
@@ -100,7 +101,7 @@
           <option value="restaurant" selected>Restaurant</option>
           <option value="cafe">Cafe / Coffee Shop</option>
           <option value="hair_salon">Hair Salon</option>
-          <option value="beauty_salon">Beauty Salon / Nail Bar</option>
+          <option value="beauty_salon">Beauty Salon</option>
           <option value="clothing_store">Clothing / Boutique</option>
           <option value="florist">Florist</option>
           <option value="gym">Gym / Fitness</option>
@@ -111,7 +112,7 @@
           <option value="pet_store">Pet Shop</option>
           <option value="car_repair">Auto Repair / Garage</option>
           <option value="bar">Bar / Pub</option>
-          <option value="accounting">Accountant / Bookkeeper</option>
+          <option value="accounting">Accountant</option>
         </select>
       </div>
       <div class="form-group">
@@ -142,7 +143,7 @@
     <div class="spinner"></div>
     <span id="statusText">Searching...</span>
   </div>
-  <div id="statusError" style="display:none;padding:14px 16px;border-radius:6px;font-size:12px;margin-bottom:20px;background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.2);color:#ff5757;"></div>
+  <div id="statusError" style="display:none;padding:14px 16px;border-radius:6px;font-size:12px;margin-bottom:20px;background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.2);color:#ff5757;white-space:pre-wrap;word-break:break-word;"></div>
 
   <div id="resultsSection" style="display:none;">
     <div class="stats-row">
@@ -179,48 +180,83 @@
 <script>
 var allResults = [];
 
+// Geocode a place name to lat/lng
 async function geocode(address, apiKey) {
-  var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(address) + '&key=' + apiKey;
+  var url = 'https://maps.googleapis.com/maps/api/geocode/json?address='
+    + encodeURIComponent(address) + '&key=' + apiKey;
   var r = await fetch(url);
   var d = await r.json();
-  if (d.status === 'REQUEST_DENIED') throw new Error('Geocoding API error: ' + (d.error_message || 'not enabled'));
-  if (d.status !== 'OK' || !d.results || !d.results.length) throw new Error('Location not found: "' + address + '". Try "London, UK" or "Manchester, UK"');
-  return d.results[0].geometry.location;
+  if (d.status === 'REQUEST_DENIED') {
+    throw new Error('Geocoding API not enabled or key is wrong. Error: ' + (d.error_message || d.status));
+  }
+  if (d.status !== 'OK' || !d.results || !d.results.length) {
+    throw new Error('Location not found: "' + address + '". Try "London, UK" or "Manchester, UK".');
+  }
+  return d.results[0].geometry.location; // { lat, lng }
 }
 
+// Search nearby using Places API (New)
 async function searchNearby(lat, lng, type, radius, apiKey, pageToken) {
   var body = {
     locationRestriction: {
       circle: {
-        center: { latitude: lat, longitude: lng },
-        radius: Number(radius)
+        center: {
+          latitude: parseFloat(lat),
+          longitude: parseFloat(lng)
+        },
+        radius: parseFloat(radius)
       }
     },
     includedTypes: [type],
-    maxResultCount: 20
+    maxResultCount: 20,
+    rankPreference: "DISTANCE"
   };
-  if (pageToken) body.pageToken = pageToken;
+
+  if (pageToken) {
+    body.pageToken = pageToken;
+  }
+
+  // Field mask — must include primaryType or types per API docs
+  var fieldMask = [
+    'places.id',
+    'places.displayName',
+    'places.formattedAddress',
+    'places.nationalPhoneNumber',
+    'places.websiteUri',
+    'places.rating',
+    'places.userRatingCount',
+    'places.primaryType',
+    'places.googleMapsUri',
+    'nextPageToken'
+  ].join(',');
 
   var resp = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': apiKey,
-      'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.types,places.googleMapsUri,nextPageToken'
+      'X-Goog-FieldMask': fieldMask
     },
     body: JSON.stringify(body)
   });
 
+  // Try to read error body for better messages
+  var respText = await resp.text();
+  var respJson = {};
+  try { respJson = JSON.parse(respText); } catch(e) {}
+
   if (!resp.ok) {
-    var errBody = {};
-    try { errBody = await resp.json(); } catch(e) {}
-    var msg = (errBody.error && errBody.error.message) || ('HTTP ' + resp.status);
-    if (resp.status === 400) throw new Error('Bad request (400): ' + msg + '. Check that Places API (New) is enabled.');
-    if (resp.status === 403) throw new Error('Permission denied (403): ' + msg + '. Enable Places API (New) in Google Cloud Console.');
-    throw new Error('API error ' + resp.status + ': ' + msg);
+    var apiMsg = (respJson.error && respJson.error.message) || respText || ('HTTP ' + resp.status);
+    if (resp.status === 400) {
+      throw new Error('400 Bad Request: ' + apiMsg);
+    }
+    if (resp.status === 403) {
+      throw new Error('403 Forbidden — Places API (New) not enabled or billing not active.\nDetails: ' + apiMsg);
+    }
+    throw new Error('API Error ' + resp.status + ': ' + apiMsg);
   }
 
-  return await resp.json();
+  return respJson;
 }
 
 async function startSearch() {
@@ -237,7 +273,7 @@ async function startSearch() {
   document.getElementById('statusError').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'none';
   allResults = [];
-  showLoading('Finding "' + location + '"...');
+  showLoading('Geocoding "' + location + '"...');
 
   try {
     var coords = await geocode(location, apiKey);
@@ -254,12 +290,12 @@ async function startSearch() {
       pageToken = data.nextPageToken || null;
       page++;
       if (pageToken && places.length < maxResults) {
-        setStatus('Found ' + places.length + ', fetching more...');
+        setStatus('Found ' + places.length + ', loading more...');
         await new Promise(function(r){ setTimeout(r, 1500); });
       }
     } while (pageToken && places.length < maxResults && page < 3);
 
-    // deduplicate
+    // Deduplicate by id
     var seen = {};
     places = places.filter(function(p) {
       if (!p.id || seen[p.id]) return false;
@@ -268,7 +304,6 @@ async function startSearch() {
     }).slice(0, maxResults);
 
     allResults = places.map(function(p) {
-      var skipTypes = {'point_of_interest':1,'establishment':1,'food':1,'premise':1};
       return {
         name: (p.displayName && p.displayName.text) || 'Unknown',
         hasWebsite: !!p.websiteUri,
@@ -277,7 +312,7 @@ async function startSearch() {
         address: p.formattedAddress || null,
         rating: p.rating || null,
         ratingsTotal: p.userRatingCount || 0,
-        types: (p.types || []).filter(function(t){ return !skipTypes[t]; }).slice(0,2),
+        primaryType: p.primaryType || '',
         mapsUrl: p.googleMapsUri || null
       };
     });
@@ -320,7 +355,7 @@ function renderTable() {
   tbody.innerHTML = filtered.map(function(r) {
     var sc = r.rating ? Math.round(r.rating) : 0;
     var stars = '★'.repeat(sc) + '☆'.repeat(5-sc);
-    var typeLabel = r.types.map(function(t){ return t.replace(/_/g,' '); }).join(', ');
+    var typeLabel = (r.primaryType || '').replace(/_/g,' ');
     return '<tr>'
       +'<td><div class="biz-name">'+esc(r.name)+'</div><div class="biz-type">'+esc(typeLabel)+'</div></td>'
       +'<td>'+(r.hasWebsite?'<span class="badge-yes">Has website</span>':'<span class="badge-no">No website</span>')+'</td>'
@@ -336,7 +371,12 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function showLoading(msg){ document.getElementById('statusText').textContent=msg; document.getElementById('statusLoading').style.display='flex'; }
 function setStatus(msg){ document.getElementById('statusText').textContent=msg; }
 function hideLoading(){ document.getElementById('statusLoading').style.display='none'; }
-function showError(msg){ hideLoading(); var el=document.getElementById('statusError'); el.textContent='⚠ '+msg; el.style.display='block'; }
+function showError(msg){
+  hideLoading();
+  var el=document.getElementById('statusError');
+  el.textContent='⚠ '+msg;
+  el.style.display='block';
+}
 
 function exportCSV() {
   var noWebsiteOnly = document.getElementById('noWebsiteOnly').checked;
@@ -348,7 +388,9 @@ function exportCSV() {
   });
   var q = function(s){ return '"'+(s||'').toString().replace(/"/g,'""')+'"'; };
   var headers = ['Business Name','Has Website','Website URL','Phone','Address','Rating','Reviews','Google Maps'];
-  var rows = filtered.map(function(r){ return [q(r.name),r.hasWebsite?'Yes':'No',q(r.website),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)]; });
+  var rows = filtered.map(function(r){
+    return [q(r.name),r.hasWebsite?'Yes':'No',q(r.website),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)];
+  });
   var csv = [headers.join(',')].concat(rows.map(function(r){ return r.join(','); })).join('\n');
   var blob = new Blob([csv],{type:'text/csv'});
   var url = URL.createObjectURL(blob);
