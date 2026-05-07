@@ -16,8 +16,9 @@
   h1 span{color:var(--accent);}
   .subtitle{color:var(--muted);font-size:13px;line-height:1.7;max-width:520px;}
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:20px;}
-  .card-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
-  .card-title::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  .card-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;}
+  .card-title-left{display:flex;align-items:center;gap:8px;}
+  .card-title-left::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
   .form-group{display:flex;flex-direction:column;gap:6px;}
   label{font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;}
@@ -28,10 +29,14 @@
   .api-note{background:rgba(184,255,87,.06);border:1px solid rgba(184,255,87,.2);border-radius:6px;padding:12px 16px;font-size:11px;color:#aaa;margin-bottom:14px;line-height:1.9;}
   .api-note a{color:var(--accent);text-decoration:none;}
   .api-note strong{color:var(--accent);}
+  .tip{background:rgba(87,212,255,.05);border:1px solid rgba(87,212,255,.15);border-radius:6px;padding:12px 16px;font-size:11px;color:#aaa;margin-bottom:14px;line-height:1.9;}
+  .tip strong{color:var(--accent2);}
   .btn{background:var(--accent);color:#000;border:none;border-radius:6px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:12px 28px;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.04em;}
   .btn:hover{opacity:.88;}.btn:active{transform:scale(.98);}.btn:disabled{opacity:.4;cursor:not-allowed;}
   .btn-secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:6px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;cursor:pointer;transition:background .15s;}
   .btn-secondary:hover{background:rgba(184,255,87,.08);}
+  .btn-danger{background:transparent;color:#ff8080;border:1px solid rgba(255,87,87,.3);border-radius:6px;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;cursor:pointer;transition:background .15s;}
+  .btn-danger:hover{background:rgba(255,87,87,.08);}
   .btn-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
   .status-bar{padding:14px 16px;border-radius:6px;font-size:12px;margin-bottom:20px;display:none;}
   .status-bar.loading{display:flex;align-items:center;gap:10px;background:rgba(87,212,255,.08);border:1px solid rgba(87,212,255,.2);color:var(--accent2);}
@@ -48,8 +53,6 @@
   tbody td{padding:12px 14px;vertical-align:top;line-height:1.5;}
   .biz-name{font-family:'Syne',sans-serif;font-weight:600;font-size:13px;color:var(--text);margin-bottom:2px;}
   .biz-type{font-size:10px;color:var(--muted);}
-  .badge-no{display:inline-block;background:rgba(255,87,87,.12);color:#ff8080;border:1px solid rgba(255,87,87,.25);border-radius:4px;font-size:10px;padding:3px 8px;text-transform:uppercase;}
-  .badge-yes{display:inline-block;background:rgba(184,255,87,.08);color:#a0cc50;border:1px solid rgba(184,255,87,.2);border-radius:4px;font-size:10px;padding:3px 8px;text-transform:uppercase;}
   .stars{color:#ffc857;font-size:11px;}
   .rating-count{color:var(--muted);font-size:10px;}
   .phone{color:var(--accent2);font-size:11px;}
@@ -59,13 +62,29 @@
   .results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
   .results-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
   .filter-bar{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap;}
-  .filter-bar input{flex:1;max-width:260px;}
-  .toggle-label{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
-  .toggle{appearance:none;width:32px;height:18px;background:var(--border);border-radius:10px;cursor:pointer;position:relative;transition:background .2s;}
-  .toggle::after{content:'';position:absolute;width:12px;height:12px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;}
-  .toggle:checked{background:var(--accent);}
-  .toggle:checked::after{left:17px;}
-  @media(max-width:600px){.form-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}}
+  .filter-bar input{flex:1;max-width:300px;}
+  .no-results-tip{text-align:center;padding:40px 20px;color:var(--muted);}
+  .no-results-tip h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;}
+  .no-results-tip p{font-size:11px;line-height:1.8;}
+  .no-results-tip strong{color:var(--accent2);}
+
+  /* History */
+  .history-list{display:flex;flex-direction:column;gap:10px;}
+  .history-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s;}
+  .history-item:hover{border-color:rgba(184,255,87,.3);}
+  .history-item-info{}
+  .history-item-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;margin-bottom:3px;text-transform:capitalize;}
+  .history-item-meta{font-size:11px;color:var(--muted);}
+  .history-item-stats{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .history-badge{background:rgba(255,87,87,.12);color:#ff8080;border:1px solid rgba(255,87,87,.2);border-radius:4px;font-size:11px;font-weight:600;padding:3px 10px;white-space:nowrap;}
+  .history-actions{display:flex;gap:6px;align-items:center;}
+  .empty-history{text-align:center;padding:30px;color:var(--muted);font-size:12px;}
+
+  /* Global search */
+  .global-search-wrap{margin-bottom:16px;}
+  .global-search-wrap input{width:100%;font-size:13px;}
+
+  @media(max-width:600px){.form-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}.history-item{flex-direction:column;align-items:flex-start;}}
 </style>
 </head>
 <body>
@@ -77,12 +96,15 @@
     <p class="subtitle">Discover local businesses with no online presence — your next web design clients.</p>
   </header>
 
+  <!-- Search Form -->
   <div class="card">
-    <div class="card-title">Configuration</div>
+    <div class="card-title"><span class="card-title-left">New Search</span></div>
     <div class="api-note">
       Requires a Google API key with <strong>Places API (New)</strong> and <strong>Geocoding API</strong> enabled in
       <a href="https://console.cloud.google.com/apis/library" target="_blank">Google Cloud Console</a>.
-      Billing must be active (free tier is generous).
+    </div>
+    <div class="tip">
+      💡 <strong>Pro tip:</strong> Search specific neighbourhoods — e.g. <strong>"Peckham, London"</strong>, <strong>"Hackney, London"</strong>. Independent local businesses are far more likely to have no website than chains in city centres.
     </div>
     <div class="form-grid">
       <div class="form-group" style="grid-column:1/-1;">
@@ -90,8 +112,8 @@
         <input type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off">
       </div>
       <div class="form-group">
-        <label>Location</label>
-        <input type="text" id="location" placeholder="e.g. Shoreditch, London" value="London, UK">
+        <label>Neighbourhood / Area</label>
+        <input type="text" id="location" placeholder="e.g. Peckham, London" value="Peckham, London">
       </div>
       <div class="form-group">
         <label>Business Type</label>
@@ -102,6 +124,7 @@
           <option value="hair salon">Hair Salon</option>
           <option value="beauty salon">Beauty Salon</option>
           <option value="nail salon">Nail Bar</option>
+          <option value="barber">Barber</option>
           <option value="clothing store">Clothing / Boutique</option>
           <option value="florist">Florist</option>
           <option value="gym">Gym / Fitness</option>
@@ -111,36 +134,29 @@
           <option value="laundry">Laundry / Dry Cleaner</option>
           <option value="pet shop">Pet Shop</option>
           <option value="car repair garage">Auto Repair / Garage</option>
-          <option value="bar pub">Bar / Pub</option>
+          <option value="pub">Pub</option>
           <option value="accountant">Accountant</option>
-          <option value="pizza restaurant">Pizza Restaurant</option>
+          <option value="takeaway">Takeaway</option>
           <option value="indian restaurant">Indian Restaurant</option>
           <option value="chinese restaurant">Chinese Restaurant</option>
           <option value="turkish restaurant">Turkish Restaurant</option>
-          <option value="takeaway">Takeaway</option>
+          <option value="pizza restaurant">Pizza Restaurant</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Search Radius</label>
-        <select id="radius">
-          <option value="500">500m — Very local</option>
-          <option value="1000" selected>1km — Neighbourhood</option>
-          <option value="2000">2km — District</option>
-          <option value="5000">5km — Borough</option>
-          <option value="10000">10km — City-wide</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Max Results</label>
+        <label>Target Leads (no website)</label>
         <select id="maxResults">
-          <option value="10">Up to 10 (fast)</option>
-          <option value="20" selected>Up to 20</option>
-          <option value="40">Up to 40</option>
+          <option value="5">5 leads</option>
+          <option value="10" selected>10 leads</option>
+          <option value="20">20 leads</option>
+          <option value="30">30 leads</option>
+          <option value="50">50 leads</option>
+          <option value="100">100 leads</option>
         </select>
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn" id="searchBtn" onclick="startSearch()">Search for Leads →</button>
+      <button class="btn" id="searchBtn" onclick="startSearch()">Find Leads →</button>
     </div>
   </div>
 
@@ -150,62 +166,93 @@
   </div>
   <div id="statusError" style="display:none;padding:14px 16px;border-radius:6px;font-size:12px;margin-bottom:20px;background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.2);color:#ff5757;white-space:pre-wrap;word-break:break-word;"></div>
 
+  <!-- Current Results -->
   <div id="resultsSection" style="display:none;">
     <div class="stats-row">
-      <div class="stat"><div class="stat-value" id="totalFound">0</div><div class="stat-label">Total Found</div></div>
+      <div class="stat"><div class="stat-value" id="totalScanned">0</div><div class="stat-label">Businesses Scanned</div></div>
       <div class="stat"><div class="stat-value" id="noWebsiteCount" style="color:#ff8080;">0</div><div class="stat-label">No Website 🎯</div></div>
       <div class="stat"><div class="stat-value" id="opportunityRate">0%</div><div class="stat-label">Opportunity Rate</div></div>
     </div>
     <div class="card" style="padding:20px 24px;">
       <div class="results-header">
-        <div class="results-title" id="resultsTitle">Results</div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <label class="toggle-label">
-            <input type="checkbox" class="toggle" id="noWebsiteOnly" onchange="renderTable()" checked>
-            No website only
-          </label>
-          <button class="btn-secondary" onclick="exportCSV()">Export CSV</button>
-        </div>
+        <div class="results-title" id="resultsTitle">Leads</div>
+        <button class="btn-secondary" onclick="exportCurrentCSV()">Export CSV</button>
       </div>
       <div class="filter-bar">
         <input type="text" id="filterInput" placeholder="Filter by name or address..." oninput="renderTable()">
       </div>
       <div style="overflow-x:auto;">
         <table>
-          <thead>
-            <tr><th>Business</th><th>Status</th><th>Rating</th><th>Phone</th><th>Address</th><th>Maps</th></tr>
-          </thead>
+          <thead><tr><th>Business</th><th>Rating</th><th>Phone</th><th>Address</th><th>Maps</th></tr></thead>
           <tbody id="resultsBody"></tbody>
         </table>
       </div>
     </div>
   </div>
+
+  <!-- Search History -->
+  <div class="card" id="historyCard" style="display:none;">
+    <div class="card-title">
+      <span class="card-title-left">Search History</span>
+      <button class="btn-danger" onclick="clearAllHistory()">Clear All</button>
+    </div>
+
+    <!-- Global search across ALL history -->
+    <div class="global-search-wrap">
+      <input type="text" id="globalSearch" placeholder="🔍  Search by name, address or phone number e.g. 07123456789..." oninput="renderGlobalSearch()">
+    </div>
+
+    <div id="globalSearchResults" style="display:none;margin-bottom:16px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;" id="globalSearchLabel"></div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Business</th><th>Search</th><th>Phone</th><th>Address</th><th>Maps</th></tr></thead>
+          <tbody id="globalSearchBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="history-list" id="historyList"></div>
+  </div>
+
 </div>
 
 <script>
-var allResults = [];
+var currentResults = [];
+var currentScanned = 0;
+var STORAGE_KEY = 'wgf_history_v1';
 
-// Uses Text Search (New) — no strict type names needed, just natural language like "restaurants in London"
+// ── Storage helpers ──────────────────────────────────────────
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch(e) { return []; }
+}
+function saveHistory(h) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h)); } catch(e) {}
+}
+function addToHistory(entry) {
+  var h = loadHistory();
+  h.unshift(entry); // newest first
+  if (h.length > 50) h = h.slice(0, 50); // keep max 50 searches
+  saveHistory(h);
+}
+
+// ── API ──────────────────────────────────────────────────────
 async function textSearch(query, apiKey, pageToken) {
   var body = { textQuery: query };
   if (pageToken) body.pageToken = pageToken;
-
-  var fieldMask = 'places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.primaryType,places.googleMapsUri,nextPageToken';
-
   var resp = await fetch('https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': apiKey,
-      'X-Goog-FieldMask': fieldMask
+      'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.primaryType,places.googleMapsUri,nextPageToken'
     },
     body: JSON.stringify(body)
   });
-
   var respText = await resp.text();
   var respJson = {};
   try { respJson = JSON.parse(respText); } catch(e) {}
-
   if (!resp.ok) {
     var msg = (respJson.error && respJson.error.message) || respText || ('HTTP ' + resp.status);
     throw new Error(resp.status + ': ' + msg);
@@ -213,11 +260,12 @@ async function textSearch(query, apiKey, pageToken) {
   return respJson;
 }
 
+// ── Main search ──────────────────────────────────────────────
 async function startSearch() {
   var apiKey = document.getElementById('apiKey').value.trim();
   var location = document.getElementById('location').value.trim();
   var type = document.getElementById('bizType').value;
-  var maxResults = parseInt(document.getElementById('maxResults').value);
+  var targetLeads = parseInt(document.getElementById('maxResults').value);
 
   if (!apiKey) { showError('Please enter your Google API key.'); return; }
   if (!location) { showError('Please enter a location.'); return; }
@@ -225,55 +273,64 @@ async function startSearch() {
   document.getElementById('searchBtn').disabled = true;
   document.getElementById('statusError').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'none';
-  allResults = [];
+  currentResults = [];
+  currentScanned = 0;
 
-  // Build natural language query e.g. "restaurants in Shoreditch London"
   var query = type + ' in ' + location;
-  showLoading('Searching for ' + query + '...');
+  showLoading('Scanning ' + query + '...');
 
   try {
-    var places = [];
     var pageToken = null;
     var page = 0;
+    var seenIds = {};
+    var maxPages = 10;
 
     do {
       var data = await textSearch(query, apiKey, pageToken);
-      places = places.concat(data.places || []);
+      var batch = data.places || [];
       pageToken = data.nextPageToken || null;
       page++;
-      if (pageToken && places.length < maxResults) {
-        setStatus('Found ' + places.length + ', loading more...');
-        await new Promise(function(r){ setTimeout(r, 1500); });
-      }
-    } while (pageToken && places.length < maxResults && page < 3);
 
-    // Deduplicate
-    var seen = {};
-    places = places.filter(function(p){
-      if (!p.id || seen[p.id]) return false;
-      seen[p.id] = true; return true;
-    }).slice(0, maxResults);
+      var fresh = batch.filter(function(p){
+        if (!p.id || seenIds[p.id]) return false;
+        seenIds[p.id] = true; return true;
+      });
+      currentScanned += fresh.length;
 
-    if (!places.length) {
-      showError('No results found for "' + query + '". Try a different location or business type.');
-      return;
-    }
+      var noSite = fresh.filter(function(p){ return !p.websiteUri; });
+      currentResults = currentResults.concat(noSite.map(function(p){
+        return {
+          name: (p.displayName && p.displayName.text) || 'Unknown',
+          phone: p.nationalPhoneNumber || null,
+          address: p.formattedAddress || null,
+          rating: p.rating || null,
+          ratingsTotal: p.userRatingCount || 0,
+          primaryType: (p.primaryType || '').replace(/_/g,' '),
+          mapsUrl: p.googleMapsUri || null
+        };
+      }));
 
-    allResults = places.map(function(p) {
-      return {
-        name: (p.displayName && p.displayName.text) || 'Unknown',
-        hasWebsite: !!p.websiteUri,
-        website: p.websiteUri || null,
-        phone: p.nationalPhoneNumber || null,
-        address: p.formattedAddress || null,
-        rating: p.rating || null,
-        ratingsTotal: p.userRatingCount || 0,
-        primaryType: (p.primaryType || '').replace(/_/g,' '),
-        mapsUrl: p.googleMapsUri || null
-      };
+      setStatus('Scanned ' + currentScanned + ' businesses, found ' + currentResults.length + ' without websites...');
+      if (currentResults.length >= targetLeads) break;
+      if (pageToken && page < maxPages) await new Promise(function(r){ setTimeout(r, 1500); });
+    } while (pageToken && page < maxPages && currentResults.length < targetLeads);
+
+    currentResults = currentResults.slice(0, targetLeads);
+
+    // Save to history
+    addToHistory({
+      id: Date.now(),
+      query: query,
+      type: type,
+      location: location,
+      date: new Date().toLocaleString('en-GB'),
+      scanned: currentScanned,
+      leads: currentResults.slice() // copy
     });
 
-    renderResults(location, type);
+    renderCurrentResults(location, type);
+    renderHistoryPanel();
+
   } catch(err) {
     showError(err.message || 'Something went wrong.');
   } finally {
@@ -282,68 +339,158 @@ async function startSearch() {
   }
 }
 
-function renderResults(location, type) {
-  var noWebsite = allResults.filter(function(r){ return !r.hasWebsite; });
-  document.getElementById('totalFound').textContent = allResults.length;
-  document.getElementById('noWebsiteCount').textContent = noWebsite.length;
-  var pct = allResults.length ? Math.round(noWebsite.length / allResults.length * 100) : 0;
+// ── Current results ──────────────────────────────────────────
+function renderCurrentResults(location, type) {
+  var pct = currentScanned ? Math.round(currentResults.length / currentScanned * 100) : 0;
+  document.getElementById('totalScanned').textContent = currentScanned;
+  document.getElementById('noWebsiteCount').textContent = currentResults.length;
   document.getElementById('opportunityRate').textContent = pct + '%';
-  document.getElementById('resultsTitle').textContent = type + ' in ' + location;
+  document.getElementById('resultsTitle').textContent = currentResults.length + ' ' + type + ' leads in ' + location;
   document.getElementById('resultsSection').style.display = 'block';
   renderTable();
   window.scrollTo({top: document.getElementById('resultsSection').offsetTop - 20, behavior:'smooth'});
 }
 
 function renderTable() {
-  var noWebsiteOnly = document.getElementById('noWebsiteOnly').checked;
   var filter = document.getElementById('filterInput').value.toLowerCase();
-  var filtered = allResults.filter(function(r) {
-    if (noWebsiteOnly && r.hasWebsite) return false;
+  var filtered = currentResults.filter(function(r){
     if (filter && !r.name.toLowerCase().includes(filter) && !(r.address||'').toLowerCase().includes(filter)) return false;
     return true;
   });
   var tbody = document.getElementById('resultsBody');
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">No results match your filters</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5"><div class="no-results-tip"><h3>No leads found in this area</h3><p>Try a more <strong>specific local neighbourhood</strong> like:<br>"<strong>Brixton, London</strong>" · "<strong>Tooting, London</strong>" · "<strong>Dalston, London</strong>"</p></div></td></tr>';
     return;
   }
-  tbody.innerHTML = filtered.map(function(r) {
-    var sc = r.rating ? Math.round(r.rating) : 0;
-    var stars = '★'.repeat(sc) + '☆'.repeat(5-sc);
-    return '<tr>'
-      +'<td><div class="biz-name">'+esc(r.name)+'</div><div class="biz-type">'+esc(r.primaryType)+'</div></td>'
-      +'<td>'+(r.hasWebsite?'<span class="badge-yes">Has website</span>':'<span class="badge-no">No website</span>')+'</td>'
-      +'<td>'+(r.rating?'<div class="stars">'+stars+'</div><div class="rating-count">'+r.rating+' ('+r.ratingsTotal+')</div>':'<span style="color:#555">—</span>')+'</td>'
-      +'<td><span class="phone">'+esc(r.phone||'—')+'</span></td>'
-      +'<td><div class="address-text">'+esc(r.address||'—')+'</div></td>'
-      +'<td>'+(r.mapsUrl?'<a class="maps-link" href="'+r.mapsUrl+'" target="_blank">View ↗</a>':'—')+'</td>'
-      +'</tr>';
+  tbody.innerHTML = filtered.map(function(r){ return buildRow(r, false); }).join('');
+}
+
+function buildRow(r, showSearch) {
+  var sc = r.rating ? Math.round(r.rating) : 0;
+  var stars = '★'.repeat(sc) + '☆'.repeat(5-sc);
+  var searchCell = showSearch ? '<td><div class="biz-type" style="max-width:100px;">'+esc(r._searchLabel||'')+'</div></td>' : '';
+  var cols = showSearch ? 5 : 5;
+  return '<tr>'
+    +'<td><div class="biz-name">'+esc(r.name)+'</div><div class="biz-type">'+esc(r.primaryType||'')+'</div></td>'
+    +(showSearch ? '<td><div class="biz-type" style="max-width:110px;color:var(--accent2);">'+esc(r._searchLabel||'')+'</div></td>' : '')
+    +'<td>'+(r.rating?'<div class="stars">'+stars+'</div><div class="rating-count">'+r.rating+' ('+r.ratingsTotal+')</div>':'<span style="color:#555">—</span>')+'</td>'
+    +'<td><span class="phone">'+esc(r.phone||'—')+'</span></td>'
+    +'<td><div class="address-text">'+esc(r.address||'—')+'</div></td>'
+    +'<td>'+(r.mapsUrl?'<a class="maps-link" href="'+r.mapsUrl+'" target="_blank">View ↗</a>':'—')+'</td>'
+    +'</tr>';
+}
+
+// ── History panel ────────────────────────────────────────────
+function renderHistoryPanel() {
+  var h = loadHistory();
+  var card = document.getElementById('historyCard');
+  if (!h.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  var list = document.getElementById('historyList');
+  list.innerHTML = h.map(function(entry){
+    return '<div class="history-item" onclick="loadHistoryEntry('+entry.id+')">'
+      +'<div class="history-item-info">'
+      +'<div class="history-item-title">'+esc(entry.query)+'</div>'
+      +'<div class="history-item-meta">'+esc(entry.date)+' &nbsp;·&nbsp; scanned '+entry.scanned+' businesses</div>'
+      +'</div>'
+      +'<div class="history-item-stats">'
+      +'<span class="history-badge">'+entry.leads.length+' leads</span>'
+      +'<button class="btn-danger" onclick="event.stopPropagation();deleteHistoryEntry('+entry.id+')">✕</button>'
+      +'</div>'
+      +'</div>';
   }).join('');
 }
 
+function loadHistoryEntry(id) {
+  var h = loadHistory();
+  var entry = h.find(function(e){ return e.id === id; });
+  if (!entry) return;
+  currentResults = entry.leads.slice();
+  currentScanned = entry.scanned;
+  renderCurrentResults(entry.location, entry.type);
+  document.getElementById('filterInput').value = '';
+}
+
+function deleteHistoryEntry(id) {
+  var h = loadHistory().filter(function(e){ return e.id !== id; });
+  saveHistory(h);
+  renderHistoryPanel();
+}
+
+function clearAllHistory() {
+  if (!confirm('Delete all search history?')) return;
+  saveHistory([]);
+  renderHistoryPanel();
+  document.getElementById('globalSearch').value = '';
+  document.getElementById('globalSearchResults').style.display = 'none';
+}
+
+// ── Global search across all history ────────────────────────
+function digitsOnly(s) { return (s||'').replace(/\D/g,''); }
+
+function renderGlobalSearch() {
+  var raw = document.getElementById('globalSearch').value.trim();
+  var q = raw.toLowerCase();
+  var qDigits = digitsOnly(raw); // strip spaces/+/- for phone matching
+  var resultsDiv = document.getElementById('globalSearchResults');
+  if (!q) { resultsDiv.style.display = 'none'; return; }
+
+  var h = loadHistory();
+  var matches = [];
+  h.forEach(function(entry){
+    (entry.leads || []).forEach(function(r){
+      var phoneDigits = digitsOnly(r.phone);
+      // Match on: name, address, or phone (digits stripped on both sides)
+      var phoneMatch = qDigits.length >= 4 && phoneDigits.includes(qDigits);
+      if (r.name.toLowerCase().includes(q) || (r.address||'').toLowerCase().includes(q) || phoneMatch) {
+        var copy = Object.assign({}, r);
+        copy._searchLabel = entry.query;
+        matches.push(copy);
+      }
+    });
+  });
+
+  document.getElementById('globalSearchLabel').textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' across all searches';
+  var tbody = document.getElementById('globalSearchBody');
+  if (!matches.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">No matches found</td></tr>';
+  } else {
+    tbody.innerHTML = matches.map(function(r){ return buildRow(r, true); }).join('');
+  }
+  resultsDiv.style.display = 'block';
+}
+
+// ── Export ───────────────────────────────────────────────────
+function exportCurrentCSV() {
+  var filter = document.getElementById('filterInput').value.toLowerCase();
+  var filtered = currentResults.filter(function(r){
+    if (filter && !r.name.toLowerCase().includes(filter)) return false;
+    return true;
+  });
+  downloadCSV(filtered, 'leads');
+}
+
+function downloadCSV(rows, prefix) {
+  var q = function(s){ return '"'+(s||'').toString().replace(/"/g,'""')+'"'; };
+  var headers = ['Business Name','Phone','Address','Rating','Reviews','Google Maps'];
+  var csvRows = rows.map(function(r){ return [q(r.name),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)]; });
+  var csv = [headers.join(',')].concat(csvRows.map(function(r){ return r.join(','); })).join('\n');
+  var blob = new Blob([csv],{type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href=url; a.download=prefix+'-'+Date.now()+'.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Helpers ──────────────────────────────────────────────────
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function showLoading(msg){ document.getElementById('statusText').textContent=msg; document.getElementById('statusLoading').style.display='flex'; }
 function setStatus(msg){ document.getElementById('statusText').textContent=msg; }
 function hideLoading(){ document.getElementById('statusLoading').style.display='none'; }
 function showError(msg){ hideLoading(); var el=document.getElementById('statusError'); el.textContent='⚠ '+msg; el.style.display='block'; }
 
-function exportCSV() {
-  var noWebsiteOnly = document.getElementById('noWebsiteOnly').checked;
-  var filter = document.getElementById('filterInput').value.toLowerCase();
-  var filtered = allResults.filter(function(r) {
-    if (noWebsiteOnly && r.hasWebsite) return false;
-    if (filter && !r.name.toLowerCase().includes(filter)) return false;
-    return true;
-  });
-  var q = function(s){ return '"'+(s||'').toString().replace(/"/g,'""')+'"'; };
-  var headers = ['Business Name','Has Website','Website URL','Phone','Address','Rating','Reviews','Google Maps'];
-  var rows = filtered.map(function(r){ return [q(r.name),r.hasWebsite?'Yes':'No',q(r.website),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)]; });
-  var csv = [headers.join(',')].concat(rows.map(function(r){ return r.join(','); })).join('\n');
-  var blob = new Blob([csv],{type:'text/csv'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a'); a.href=url; a.download='leads-'+Date.now()+'.csv'; a.click();
-  URL.revokeObjectURL(url);
-}
+// Init — show history on load
+renderHistoryPanel();
 </script>
 </body>
 </html>
