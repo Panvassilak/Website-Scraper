@@ -35,7 +35,6 @@
   .btn-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
   .status-bar{padding:14px 16px;border-radius:6px;font-size:12px;margin-bottom:20px;display:none;}
   .status-bar.loading{display:flex;align-items:center;gap:10px;background:rgba(87,212,255,.08);border:1px solid rgba(87,212,255,.2);color:var(--accent2);}
-  .status-bar.error{display:block;}
   .spinner{width:14px;height:14px;border:2px solid rgba(87,212,255,.3);border-top-color:var(--accent2);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
   @keyframes spin{to{transform:rotate(360deg);}}
   .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
@@ -66,8 +65,6 @@
   .toggle::after{content:'';position:absolute;width:12px;height:12px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;}
   .toggle:checked{background:var(--accent);}
   .toggle:checked::after{left:17px;}
-  .progress-bar-wrap{width:100%;height:4px;background:var(--surface2);border-radius:2px;margin-top:8px;overflow:hidden;}
-  .progress-bar{height:4px;background:var(--accent2);border-radius:2px;transition:width .3s;width:0%;}
   @media(max-width:600px){.form-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
@@ -83,10 +80,9 @@
   <div class="card">
     <div class="card-title">Configuration</div>
     <div class="api-note">
-      Uses the <strong>Google Places API (New)</strong>. You need an API key with these 3 APIs enabled in
-      <a href="https://console.cloud.google.com/apis/library" target="_blank">Google Cloud Console</a>:<br>
-      ① <strong>Places API (New)</strong> &nbsp;② <strong>Maps JavaScript API</strong> &nbsp;③ <strong>Geocoding API</strong><br>
-      Billing must be active (free tier covers thousands of searches/month).
+      Requires a Google API key with <strong>Geocoding API</strong> and <strong>Places API (New)</strong> enabled in
+      <a href="https://console.cloud.google.com/apis/library" target="_blank">Google Cloud Console</a>.
+      Billing must be active (free tier is generous).
     </div>
     <div class="form-grid">
       <div class="form-group" style="grid-column:1/-1;">
@@ -143,15 +139,10 @@
   </div>
 
   <div class="status-bar loading" id="statusLoading">
-    <div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div class="spinner"></div>
-        <span id="statusText">Searching...</span>
-      </div>
-      <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
-    </div>
+    <div class="spinner"></div>
+    <span id="statusText">Searching...</span>
   </div>
-  <div class="status-bar error" id="statusError"></div>
+  <div id="statusError" style="display:none;padding:14px 16px;border-radius:6px;font-size:12px;margin-bottom:20px;background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.2);color:#ff5757;"></div>
 
   <div id="resultsSection" style="display:none;">
     <div class="stats-row">
@@ -187,106 +178,97 @@
 
 <script>
 var allResults = [];
-var API_KEY = '';
 
-// Step 1: Geocode using Geocoding API (REST - works from browser with API key)
-async function geocode(address) {
-  var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(address) + '&key=' + API_KEY;
+async function geocode(address, apiKey) {
+  var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(address) + '&key=' + apiKey;
   var r = await fetch(url);
   var d = await r.json();
-  if (d.status === 'REQUEST_DENIED') throw new Error('API key error: ' + (d.error_message || 'Geocoding API not enabled'));
-  if (d.status !== 'OK' || !d.results.length) throw new Error('Location not found: "' + address + '"');
-  return d.results[0].geometry.location; // {lat, lng}
+  if (d.status === 'REQUEST_DENIED') throw new Error('Geocoding API error: ' + (d.error_message || 'not enabled'));
+  if (d.status !== 'OK' || !d.results || !d.results.length) throw new Error('Location not found: "' + address + '". Try "London, UK" or "Manchester, UK"');
+  return d.results[0].geometry.location;
 }
 
-// Step 2: Nearby search using Places API (New) - Text Search endpoint
-async function searchNearby(lat, lng, type, radius, pageToken) {
+async function searchNearby(lat, lng, type, radius, apiKey, pageToken) {
   var body = {
-    includedTypes: [type],
-    maxResultCount: 20,
     locationRestriction: {
       circle: {
         center: { latitude: lat, longitude: lng },
-        radius: parseFloat(radius)
+        radius: Number(radius)
       }
-    }
+    },
+    includedTypes: [type],
+    maxResultCount: 20
   };
   if (pageToken) body.pageToken = pageToken;
 
-  var r = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+  var resp = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-Goog-Api-Key': API_KEY,
+      'X-Goog-Api-Key': apiKey,
       'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.types,places.googleMapsUri,nextPageToken'
     },
     body: JSON.stringify(body)
   });
 
-  if (!r.ok) {
-    var err = await r.json().catch(() => ({}));
-    var msg = (err.error && err.error.message) || ('HTTP ' + r.status);
-    if (msg.includes('PERMISSION_DENIED') || msg.includes('not enabled')) {
-      throw new Error('Places API (New) is not enabled. Go to Google Cloud Console → APIs & Services → Enable "Places API (New)"');
-    }
-    throw new Error('Places API error: ' + msg);
+  if (!resp.ok) {
+    var errBody = {};
+    try { errBody = await resp.json(); } catch(e) {}
+    var msg = (errBody.error && errBody.error.message) || ('HTTP ' + resp.status);
+    if (resp.status === 400) throw new Error('Bad request (400): ' + msg + '. Check that Places API (New) is enabled.');
+    if (resp.status === 403) throw new Error('Permission denied (403): ' + msg + '. Enable Places API (New) in Google Cloud Console.');
+    throw new Error('API error ' + resp.status + ': ' + msg);
   }
 
-  return await r.json(); // { places: [...], nextPageToken }
+  return await resp.json();
 }
 
 async function startSearch() {
-  API_KEY = document.getElementById('apiKey').value.trim();
+  var apiKey = document.getElementById('apiKey').value.trim();
   var location = document.getElementById('location').value.trim();
   var type = document.getElementById('bizType').value;
   var radius = document.getElementById('radius').value;
   var maxResults = parseInt(document.getElementById('maxResults').value);
 
-  if (!API_KEY) { showError('Please enter your Google API key.'); return; }
+  if (!apiKey) { showError('Please enter your Google API key.'); return; }
   if (!location) { showError('Please enter a location.'); return; }
 
   document.getElementById('searchBtn').disabled = true;
   document.getElementById('statusError').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'none';
   allResults = [];
-  setProgress(0);
   showLoading('Finding "' + location + '"...');
 
   try {
-    // Geocode
-    var coords = await geocode(location);
-    setProgress(10);
+    var coords = await geocode(location, apiKey);
     setStatus('Searching for ' + type.replace(/_/g,' ') + ' near ' + location + '...');
 
-    // Collect places
     var places = [];
     var pageToken = null;
-    var pages = 0;
+    var page = 0;
+
     do {
-      var data = await searchNearby(coords.lat, coords.lng, type, radius, pageToken);
+      var data = await searchNearby(coords.lat, coords.lng, type, radius, apiKey, pageToken);
       var batch = data.places || [];
       places = places.concat(batch);
       pageToken = data.nextPageToken || null;
-      pages++;
+      page++;
       if (pageToken && places.length < maxResults) {
-        setStatus('Found ' + places.length + ', loading more...');
-        await sleep(1000);
+        setStatus('Found ' + places.length + ', fetching more...');
+        await new Promise(function(r){ setTimeout(r, 1500); });
       }
-    } while (pageToken && places.length < maxResults && pages < 3);
+    } while (pageToken && places.length < maxResults && page < 3);
 
-    // Deduplicate and limit
+    // deduplicate
     var seen = {};
     places = places.filter(function(p) {
-      if (seen[p.id]) return false;
+      if (!p.id || seen[p.id]) return false;
       seen[p.id] = true;
       return true;
     }).slice(0, maxResults);
 
-    setProgress(30);
-    setStatus('Analysing ' + places.length + ' businesses...');
-
-    // The new API already returns website in the search — no need for a separate details call!
-    var results = places.map(function(p, i) {
+    allResults = places.map(function(p) {
+      var skipTypes = {'point_of_interest':1,'establishment':1,'food':1,'premise':1};
       return {
         name: (p.displayName && p.displayName.text) || 'Unknown',
         hasWebsite: !!p.websiteUri,
@@ -295,19 +277,15 @@ async function startSearch() {
         address: p.formattedAddress || null,
         rating: p.rating || null,
         ratingsTotal: p.userRatingCount || 0,
-        types: (p.types || []).filter(function(t) {
-          return t !== 'point_of_interest' && t !== 'establishment' && t !== 'food';
-        }).slice(0, 2),
+        types: (p.types || []).filter(function(t){ return !skipTypes[t]; }).slice(0,2),
         mapsUrl: p.googleMapsUri || null
       };
     });
 
-    setProgress(100);
-    allResults = results;
     renderResults(location, type);
 
   } catch(err) {
-    showError(err.message || 'Something went wrong. Check your API key and enabled APIs.');
+    showError(err.message || 'Something went wrong.');
   } finally {
     document.getElementById('searchBtn').disabled = false;
     hideLoading();
@@ -318,12 +296,12 @@ function renderResults(location, type) {
   var noWebsite = allResults.filter(function(r){ return !r.hasWebsite; });
   document.getElementById('totalFound').textContent = allResults.length;
   document.getElementById('noWebsiteCount').textContent = noWebsite.length;
-  var pct = allResults.length ? Math.round((noWebsite.length / allResults.length) * 100) : 0;
+  var pct = allResults.length ? Math.round(noWebsite.length / allResults.length * 100) : 0;
   document.getElementById('opportunityRate').textContent = pct + '%';
   document.getElementById('resultsTitle').textContent = type.replace(/_/g,' ') + ' near ' + location;
   document.getElementById('resultsSection').style.display = 'block';
   renderTable();
-  window.scrollTo({ top: document.getElementById('resultsSection').offsetTop - 20, behavior: 'smooth' });
+  window.scrollTo({top: document.getElementById('resultsSection').offsetTop - 20, behavior:'smooth'});
 }
 
 function renderTable() {
@@ -334,40 +312,31 @@ function renderTable() {
     if (filter && !r.name.toLowerCase().includes(filter) && !(r.address||'').toLowerCase().includes(filter)) return false;
     return true;
   });
-
   var tbody = document.getElementById('resultsBody');
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">No results match your filters</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">No results match filters</td></tr>';
     return;
   }
-
   tbody.innerHTML = filtered.map(function(r) {
     var sc = r.rating ? Math.round(r.rating) : 0;
-    var stars = '★'.repeat(sc) + '☆'.repeat(5 - sc);
+    var stars = '★'.repeat(sc) + '☆'.repeat(5-sc);
     var typeLabel = r.types.map(function(t){ return t.replace(/_/g,' '); }).join(', ');
     return '<tr>'
-      + '<td><div class="biz-name">' + esc(r.name) + '</div><div class="biz-type">' + esc(typeLabel) + '</div></td>'
-      + '<td>' + (r.hasWebsite ? '<span class="badge-yes">Has website</span>' : '<span class="badge-no">No website</span>') + '</td>'
-      + '<td>' + (r.rating ? '<div class="stars">' + stars + '</div><div class="rating-count">' + r.rating + ' (' + r.ratingsTotal + ')</div>' : '<span style="color:#555">—</span>') + '</td>'
-      + '<td><span class="phone">' + esc(r.phone || '—') + '</span></td>'
-      + '<td><div class="address-text">' + esc(r.address || '—') + '</div></td>'
-      + '<td>' + (r.mapsUrl ? '<a class="maps-link" href="' + r.mapsUrl + '" target="_blank">View ↗</a>' : '—') + '</td>'
-      + '</tr>';
+      +'<td><div class="biz-name">'+esc(r.name)+'</div><div class="biz-type">'+esc(typeLabel)+'</div></td>'
+      +'<td>'+(r.hasWebsite?'<span class="badge-yes">Has website</span>':'<span class="badge-no">No website</span>')+'</td>'
+      +'<td>'+(r.rating?'<div class="stars">'+stars+'</div><div class="rating-count">'+r.rating+' ('+r.ratingsTotal+')</div>':'<span style="color:#555">—</span>')+'</td>'
+      +'<td><span class="phone">'+esc(r.phone||'—')+'</span></td>'
+      +'<td><div class="address-text">'+esc(r.address||'—')+'</div></td>'
+      +'<td>'+(r.mapsUrl?'<a class="maps-link" href="'+r.mapsUrl+'" target="_blank">View ↗</a>':'—')+'</td>'
+      +'</tr>';
   }).join('');
 }
 
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
-function setProgress(p) { document.getElementById('progressBar').style.width = p + '%'; }
-function showLoading(msg) { document.getElementById('statusText').textContent = msg; document.getElementById('statusLoading').style.display = 'flex'; }
-function setStatus(msg) { document.getElementById('statusText').textContent = msg; }
-function hideLoading() { document.getElementById('statusLoading').style.display = 'none'; }
-function showError(msg) {
-  hideLoading();
-  var el = document.getElementById('statusError');
-  el.textContent = '⚠ ' + msg;
-  el.style.cssText = 'display:block;background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.2);color:var(--danger);padding:14px 16px;border-radius:6px;font-size:12px;margin-bottom:20px;';
-}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showLoading(msg){ document.getElementById('statusText').textContent=msg; document.getElementById('statusLoading').style.display='flex'; }
+function setStatus(msg){ document.getElementById('statusText').textContent=msg; }
+function hideLoading(){ document.getElementById('statusLoading').style.display='none'; }
+function showError(msg){ hideLoading(); var el=document.getElementById('statusError'); el.textContent='⚠ '+msg; el.style.display='block'; }
 
 function exportCSV() {
   var noWebsiteOnly = document.getElementById('noWebsiteOnly').checked;
@@ -377,13 +346,13 @@ function exportCSV() {
     if (filter && !r.name.toLowerCase().includes(filter)) return false;
     return true;
   });
-  var q = function(s){ return '"' + (s||'').toString().replace(/"/g,'""') + '"'; };
+  var q = function(s){ return '"'+(s||'').toString().replace(/"/g,'""')+'"'; };
   var headers = ['Business Name','Has Website','Website URL','Phone','Address','Rating','Reviews','Google Maps'];
-  var rows = filtered.map(function(r){ return [q(r.name), r.hasWebsite?'Yes':'No', q(r.website), q(r.phone), q(r.address), r.rating||'', r.ratingsTotal||'', q(r.mapsUrl)]; });
+  var rows = filtered.map(function(r){ return [q(r.name),r.hasWebsite?'Yes':'No',q(r.website),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)]; });
   var csv = [headers.join(',')].concat(rows.map(function(r){ return r.join(','); })).join('\n');
-  var blob = new Blob([csv], {type:'text/csv'});
+  var blob = new Blob([csv],{type:'text/csv'});
   var url = URL.createObjectURL(blob);
-  var a = document.createElement('a'); a.href = url; a.download = 'leads-no-website-' + Date.now() + '.csv'; a.click();
+  var a = document.createElement('a'); a.href=url; a.download='leads-'+Date.now()+'.csv'; a.click();
   URL.revokeObjectURL(url);
 }
 </script>
