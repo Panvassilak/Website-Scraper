@@ -6,7 +6,7 @@
 <title>Website Gap Finder</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0d0d0d;--surface:#161616;--surface2:#1f1f1f;--border:#2a2a2a;--accent:#b8ff57;--accent2:#57d4ff;--danger:#ff5757;--text:#f0f0f0;--muted:#888;--radius:10px;}
+  :root{--bg:#0d0d0d;--surface:#161616;--surface2:#1f1f1f;--border:#2a2a2a;--accent:#b8ff57;--accent2:#57d4ff;--danger:#ff5757;--text:#f0f0f0;--muted:#888;--radius:10px;--orange:#ffaa57;}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;padding:40px 24px;}
   .container{max-width:960px;margin:0 auto;}
@@ -19,13 +19,15 @@
   .card-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;}
   .card-title-left{display:flex;align-items:center;gap:8px;}
   .card-title-left::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  .card-title-left.orange::before{background:var(--orange);}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
   .form-group{display:flex;flex-direction:column;gap:6px;}
   label{font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;}
-  input,select{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:10px 14px;outline:none;transition:border-color .15s;width:100%;}
-  input:focus,select:focus{border-color:var(--accent);}
-  input::placeholder{color:#444;}
+  input,select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:10px 14px;outline:none;transition:border-color .15s;width:100%;}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+  input::placeholder,textarea::placeholder{color:#444;}
   select option{background:#1f1f1f;}
+  textarea{resize:vertical;min-height:60px;line-height:1.6;}
   .api-note{background:rgba(184,255,87,.06);border:1px solid rgba(184,255,87,.2);border-radius:6px;padding:12px 16px;font-size:11px;color:#aaa;margin-bottom:14px;line-height:1.9;}
   .api-note a{color:var(--accent);text-decoration:none;}
   .api-note strong{color:var(--accent);}
@@ -37,6 +39,13 @@
   .btn-secondary:hover{background:rgba(184,255,87,.08);}
   .btn-danger{background:transparent;color:#ff8080;border:1px solid rgba(255,87,87,.3);border-radius:6px;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;cursor:pointer;transition:background .15s;}
   .btn-danger:hover{background:rgba(255,87,87,.08);}
+  /* Callback button */
+  .btn-callback{background:transparent;color:var(--orange);border:1px solid rgba(255,170,87,.35);border-radius:6px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;transition:background .15s;white-space:nowrap;letter-spacing:.03em;}
+  .btn-callback:hover{background:rgba(255,170,87,.1);}
+  .btn-callback.added{background:rgba(255,170,87,.15);color:var(--orange);border-color:var(--orange);}
+  /* Done button */
+  .btn-done{background:transparent;color:#a0cc50;border:1px solid rgba(184,255,87,.3);border-radius:6px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;transition:background .15s;white-space:nowrap;}
+  .btn-done:hover{background:rgba(184,255,87,.08);}
   .btn-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
   .status-bar{padding:14px 16px;border-radius:6px;font-size:12px;margin-bottom:20px;display:none;}
   .status-bar.loading{display:flex;align-items:center;gap:10px;background:rgba(87,212,255,.08);border:1px solid rgba(87,212,255,.2);color:var(--accent2);}
@@ -50,13 +59,13 @@
   thead th{text-align:left;padding:10px 14px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border);}
   tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
   tbody tr:hover{background:var(--surface2);}
-  tbody td{padding:12px 14px;vertical-align:top;line-height:1.5;}
+  tbody td{padding:10px 14px;vertical-align:middle;line-height:1.5;}
   .biz-name{font-family:'Syne',sans-serif;font-weight:600;font-size:13px;color:var(--text);margin-bottom:2px;}
   .biz-type{font-size:10px;color:var(--muted);}
   .stars{color:#ffc857;font-size:11px;}
   .rating-count{color:var(--muted);font-size:10px;}
   .phone{color:var(--accent2);font-size:11px;}
-  .address-text{color:#aaa;font-size:11px;max-width:180px;line-height:1.5;}
+  .address-text{color:#aaa;font-size:11px;max-width:160px;line-height:1.5;}
   .maps-link{color:var(--accent);text-decoration:none;font-size:11px;}
   .maps-link:hover{text-decoration:underline;}
   .results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
@@ -67,24 +76,32 @@
   .no-results-tip h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;}
   .no-results-tip p{font-size:11px;line-height:1.8;}
   .no-results-tip strong{color:var(--accent2);}
-
+  /* Callback list */
+  .callback-list{display:flex;flex-direction:column;gap:12px;}
+  .callback-item{background:var(--surface2);border:1px solid rgba(255,170,87,.2);border-radius:8px;padding:16px 18px;}
+  .callback-item.done-item{border-color:rgba(184,255,87,.15);opacity:.6;}
+  .cb-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;}
+  .cb-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
+  .cb-phone{color:var(--accent2);font-size:12px;margin-top:2px;}
+  .cb-address{color:var(--muted);font-size:11px;margin-top:2px;}
+  .cb-added{color:var(--muted);font-size:10px;margin-top:4px;}
+  .cb-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+  .cb-notes{width:100%;font-size:12px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;resize:vertical;min-height:52px;}
+  .cb-notes:focus{outline:none;border-color:var(--orange);}
+  .cb-notes::placeholder{color:#555;}
+  .done-badge{display:inline-block;background:rgba(184,255,87,.1);color:#a0cc50;border:1px solid rgba(184,255,87,.2);border-radius:4px;font-size:10px;padding:2px 8px;font-weight:600;}
+  .empty-cb{text-align:center;padding:30px;color:var(--muted);font-size:12px;line-height:1.8;}
   /* History */
   .history-list{display:flex;flex-direction:column;gap:10px;}
   .history-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s;}
   .history-item:hover{border-color:rgba(184,255,87,.3);}
-  .history-item-info{}
   .history-item-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;margin-bottom:3px;text-transform:capitalize;}
   .history-item-meta{font-size:11px;color:var(--muted);}
   .history-item-stats{display:flex;align-items:center;gap:8px;flex-shrink:0;}
   .history-badge{background:rgba(255,87,87,.12);color:#ff8080;border:1px solid rgba(255,87,87,.2);border-radius:4px;font-size:11px;font-weight:600;padding:3px 10px;white-space:nowrap;}
-  .history-actions{display:flex;gap:6px;align-items:center;}
-  .empty-history{text-align:center;padding:30px;color:var(--muted);font-size:12px;}
-
-  /* Global search */
   .global-search-wrap{margin-bottom:16px;}
   .global-search-wrap input{width:100%;font-size:13px;}
-
-  @media(max-width:600px){.form-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}.history-item{flex-direction:column;align-items:flex-start;}}
+  @media(max-width:600px){.form-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}.history-item{flex-direction:column;align-items:flex-start;}.cb-top{flex-direction:column;}}
 </style>
 </head>
 <body>
@@ -169,7 +186,7 @@
   <!-- Current Results -->
   <div id="resultsSection" style="display:none;">
     <div class="stats-row">
-      <div class="stat"><div class="stat-value" id="totalScanned">0</div><div class="stat-label">Businesses Scanned</div></div>
+      <div class="stat"><div class="stat-value" id="totalScanned">0</div><div class="stat-label">Scanned</div></div>
       <div class="stat"><div class="stat-value" id="noWebsiteCount" style="color:#ff8080;">0</div><div class="stat-label">No Website 🎯</div></div>
       <div class="stat"><div class="stat-value" id="opportunityRate">0%</div><div class="stat-label">Opportunity Rate</div></div>
     </div>
@@ -183,10 +200,21 @@
       </div>
       <div style="overflow-x:auto;">
         <table>
-          <thead><tr><th>Business</th><th>Rating</th><th>Phone</th><th>Address</th><th>Maps</th></tr></thead>
+          <thead><tr><th>Business</th><th>Rating</th><th>Phone</th><th>Address</th><th>Maps</th><th>Action</th></tr></thead>
           <tbody id="resultsBody"></tbody>
         </table>
       </div>
+    </div>
+  </div>
+
+  <!-- ★ CALLBACK LIST ★ -->
+  <div class="card" id="callbackCard" style="display:none;">
+    <div class="card-title">
+      <span class="card-title-left orange">📞 Call Back List <span id="callbackCountBadge" style="background:rgba(255,170,87,.2);color:var(--orange);border-radius:4px;padding:2px 8px;font-size:11px;margin-left:6px;">0</span></span>
+      <button class="btn-danger" onclick="clearDoneCallbacks()">Clear Done</button>
+    </div>
+    <div class="callback-list" id="callbackList">
+      <div class="empty-cb">No callbacks yet.<br>Hit <strong style="color:var(--orange)">📞 Call Back</strong> on any lead to add them here.</div>
     </div>
   </div>
 
@@ -196,22 +224,18 @@
       <span class="card-title-left">Search History</span>
       <button class="btn-danger" onclick="clearAllHistory()">Clear All</button>
     </div>
-
-    <!-- Global search across ALL history -->
     <div class="global-search-wrap">
       <input type="text" id="globalSearch" placeholder="🔍  Search by name, address or phone number e.g. 07123456789..." oninput="renderGlobalSearch()">
     </div>
-
     <div id="globalSearchResults" style="display:none;margin-bottom:16px;">
       <div style="font-size:11px;color:var(--muted);margin-bottom:10px;" id="globalSearchLabel"></div>
       <div style="overflow-x:auto;">
         <table>
-          <thead><tr><th>Business</th><th>Search</th><th>Phone</th><th>Address</th><th>Maps</th></tr></thead>
+          <thead><tr><th>Business</th><th>Search</th><th>Phone</th><th>Address</th><th>Maps</th><th>Action</th></tr></thead>
           <tbody id="globalSearchBody"></tbody>
         </table>
       </div>
     </div>
-
     <div class="history-list" id="historyList"></div>
   </div>
 
@@ -220,22 +244,14 @@
 <script>
 var currentResults = [];
 var currentScanned = 0;
-var STORAGE_KEY = 'wgf_history_v1';
+var HISTORY_KEY = 'wgf_history_v1';
+var CALLBACK_KEY = 'wgf_callbacks_v1';
 
-// ── Storage helpers ──────────────────────────────────────────
-function loadHistory() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch(e) { return []; }
-}
-function saveHistory(h) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(h)); } catch(e) {}
-}
-function addToHistory(entry) {
-  var h = loadHistory();
-  h.unshift(entry); // newest first
-  if (h.length > 50) h = h.slice(0, 50); // keep max 50 searches
-  saveHistory(h);
-}
+// ── Storage ──────────────────────────────────────────────────
+function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch(e) { return []; } }
+function saveHistory(h) { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch(e) {} }
+function loadCallbacks() { try { return JSON.parse(localStorage.getItem(CALLBACK_KEY)) || []; } catch(e) { return []; } }
+function saveCallbacks(c) { try { localStorage.setItem(CALLBACK_KEY, JSON.stringify(c)); } catch(e) {} }
 
 // ── API ──────────────────────────────────────────────────────
 async function textSearch(query, apiKey, pageToken) {
@@ -266,71 +282,37 @@ async function startSearch() {
   var location = document.getElementById('location').value.trim();
   var type = document.getElementById('bizType').value;
   var targetLeads = parseInt(document.getElementById('maxResults').value);
-
   if (!apiKey) { showError('Please enter your Google API key.'); return; }
   if (!location) { showError('Please enter a location.'); return; }
-
   document.getElementById('searchBtn').disabled = true;
   document.getElementById('statusError').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'none';
-  currentResults = [];
-  currentScanned = 0;
-
+  currentResults = []; currentScanned = 0;
   var query = type + ' in ' + location;
   showLoading('Scanning ' + query + '...');
-
   try {
-    var pageToken = null;
-    var page = 0;
-    var seenIds = {};
-    var maxPages = 10;
-
+    var pageToken = null, page = 0, seenIds = {}, maxPages = 10;
     do {
       var data = await textSearch(query, apiKey, pageToken);
       var batch = data.places || [];
-      pageToken = data.nextPageToken || null;
-      page++;
-
-      var fresh = batch.filter(function(p){
-        if (!p.id || seenIds[p.id]) return false;
-        seenIds[p.id] = true; return true;
-      });
+      pageToken = data.nextPageToken || null; page++;
+      var fresh = batch.filter(function(p){ if(!p.id||seenIds[p.id])return false; seenIds[p.id]=true; return true; });
       currentScanned += fresh.length;
-
       var noSite = fresh.filter(function(p){ return !p.websiteUri; });
       currentResults = currentResults.concat(noSite.map(function(p){
-        return {
-          name: (p.displayName && p.displayName.text) || 'Unknown',
-          phone: p.nationalPhoneNumber || null,
-          address: p.formattedAddress || null,
-          rating: p.rating || null,
-          ratingsTotal: p.userRatingCount || 0,
-          primaryType: (p.primaryType || '').replace(/_/g,' '),
-          mapsUrl: p.googleMapsUri || null
-        };
+        return { name:(p.displayName&&p.displayName.text)||'Unknown', phone:p.nationalPhoneNumber||null, address:p.formattedAddress||null, rating:p.rating||null, ratingsTotal:p.userRatingCount||0, primaryType:(p.primaryType||'').replace(/_/g,' '), mapsUrl:p.googleMapsUri||null };
       }));
-
-      setStatus('Scanned ' + currentScanned + ' businesses, found ' + currentResults.length + ' without websites...');
+      setStatus('Scanned '+currentScanned+' businesses, found '+currentResults.length+' without websites...');
       if (currentResults.length >= targetLeads) break;
       if (pageToken && page < maxPages) await new Promise(function(r){ setTimeout(r, 1500); });
     } while (pageToken && page < maxPages && currentResults.length < targetLeads);
-
     currentResults = currentResults.slice(0, targetLeads);
-
-    // Save to history
-    addToHistory({
-      id: Date.now(),
-      query: query,
-      type: type,
-      location: location,
-      date: new Date().toLocaleString('en-GB'),
-      scanned: currentScanned,
-      leads: currentResults.slice() // copy
-    });
-
+    var history = loadHistory();
+    history.unshift({ id: Date.now(), query:query, type:type, location:location, date:new Date().toLocaleString('en-GB'), scanned:currentScanned, leads:currentResults.slice() });
+    if (history.length > 50) history = history.slice(0, 50);
+    saveHistory(history);
     renderCurrentResults(location, type);
     renderHistoryPanel();
-
   } catch(err) {
     showError(err.message || 'Something went wrong.');
   } finally {
@@ -359,7 +341,7 @@ function renderTable() {
   });
   var tbody = document.getElementById('resultsBody');
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="5"><div class="no-results-tip"><h3>No leads found in this area</h3><p>Try a more <strong>specific local neighbourhood</strong> like:<br>"<strong>Brixton, London</strong>" · "<strong>Tooting, London</strong>" · "<strong>Dalston, London</strong>"</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6"><div class="no-results-tip"><h3>No leads found in this area</h3><p>Try a more <strong>specific local neighbourhood</strong>.</p></div></td></tr>';
     return;
   }
   tbody.innerHTML = filtered.map(function(r){ return buildRow(r, false); }).join('');
@@ -368,8 +350,9 @@ function renderTable() {
 function buildRow(r, showSearch) {
   var sc = r.rating ? Math.round(r.rating) : 0;
   var stars = '★'.repeat(sc) + '☆'.repeat(5-sc);
-  var searchCell = showSearch ? '<td><div class="biz-type" style="max-width:100px;">'+esc(r._searchLabel||'')+'</div></td>' : '';
-  var cols = showSearch ? 5 : 5;
+  var cbState = isInCallbacks(r) ? ' added' : '';
+  var cbLabel = isInCallbacks(r) ? '✓ Added' : '📞 Call Back';
+  var safeR = encodeURIComponent(JSON.stringify(r));
   return '<tr>'
     +'<td><div class="biz-name">'+esc(r.name)+'</div><div class="biz-type">'+esc(r.primaryType||'')+'</div></td>'
     +(showSearch ? '<td><div class="biz-type" style="max-width:110px;color:var(--accent2);">'+esc(r._searchLabel||'')+'</div></td>' : '')
@@ -377,34 +360,106 @@ function buildRow(r, showSearch) {
     +'<td><span class="phone">'+esc(r.phone||'—')+'</span></td>'
     +'<td><div class="address-text">'+esc(r.address||'—')+'</div></td>'
     +'<td>'+(r.mapsUrl?'<a class="maps-link" href="'+r.mapsUrl+'" target="_blank">View ↗</a>':'—')+'</td>'
+    +'<td><button class="btn-callback'+cbState+'" onclick="addCallback(\''+esc(r.name)+'\',\''+esc(r.phone||'')+'\',\''+esc(r.address||'')+'\',\''+esc(r.mapsUrl||'')+'\',this)">'+cbLabel+'</button></td>'
     +'</tr>';
+}
+
+// ── Callback functions ────────────────────────────────────────
+function isInCallbacks(r) {
+  var cbs = loadCallbacks();
+  return cbs.some(function(c){ return c.name === r.name && c.phone === r.phone; });
+}
+
+function addCallback(name, phone, address, mapsUrl, btn) {
+  if (btn && btn.classList.contains('added')) return; // already added
+  var cbs = loadCallbacks();
+  // Check not duplicate
+  if (cbs.some(function(c){ return c.name === name && c.phone === phone; })) {
+    if (btn) { btn.textContent = '✓ Added'; btn.classList.add('added'); }
+    return;
+  }
+  cbs.unshift({ id: Date.now(), name:name, phone:phone, address:address, mapsUrl:mapsUrl, notes:'', done:false, addedAt:new Date().toLocaleString('en-GB') });
+  saveCallbacks(cbs);
+  if (btn) { btn.textContent = '✓ Added'; btn.classList.add('added'); }
+  renderCallbackPanel();
+}
+
+function renderCallbackPanel() {
+  var cbs = loadCallbacks();
+  var card = document.getElementById('callbackCard');
+  var pending = cbs.filter(function(c){ return !c.done; });
+  document.getElementById('callbackCountBadge').textContent = pending.length;
+  card.style.display = 'block';
+
+  var list = document.getElementById('callbackList');
+  if (!cbs.length) {
+    list.innerHTML = '<div class="empty-cb">No callbacks yet.<br>Hit <strong style="color:var(--orange)">📞 Call Back</strong> on any lead to add them here.</div>';
+    return;
+  }
+
+  // Show pending first, then done
+  var sorted = cbs.slice().sort(function(a,b){ return (a.done?1:0)-(b.done?1:0); });
+  list.innerHTML = sorted.map(function(cb){
+    return '<div class="callback-item'+(cb.done?' done-item':'')+'" id="cb-'+cb.id+'">'
+      +'<div class="cb-top">'
+      +'<div>'
+      +'<div class="cb-name">'+esc(cb.name)+(cb.done?' <span class="done-badge">Done ✓</span>':'')+'</div>'
+      +(cb.phone?'<div class="cb-phone">📞 '+esc(cb.phone)+'</div>':'')
+      +(cb.address?'<div class="cb-address">'+esc(cb.address)+'</div>':'')
+      +'<div class="cb-added">Added '+esc(cb.addedAt)+'</div>'
+      +'</div>'
+      +'<div class="cb-actions">'
+      +(cb.mapsUrl?'<a class="maps-link" href="'+esc(cb.mapsUrl)+'" target="_blank" style="font-size:12px;">Maps ↗</a>':'')
+      +(!cb.done?'<button class="btn-done" onclick="markCallbackDone('+cb.id+')">✓ Done</button>':'')
+      +'<button class="btn-danger" onclick="removeCallback('+cb.id+')">✕</button>'
+      +'</div>'
+      +'</div>'
+      +'<textarea class="cb-notes" placeholder="Add notes e.g. spoke to owner, call back Tuesday..." onchange="updateCallbackNotes('+cb.id+', this.value)">'+esc(cb.notes)+'</textarea>'
+      +'</div>';
+  }).join('');
+}
+
+function markCallbackDone(id) {
+  var cbs = loadCallbacks().map(function(c){ if(c.id===id) c.done=true; return c; });
+  saveCallbacks(cbs);
+  renderCallbackPanel();
+}
+
+function removeCallback(id) {
+  var cbs = loadCallbacks().filter(function(c){ return c.id !== id; });
+  saveCallbacks(cbs);
+  renderCallbackPanel();
+}
+
+function updateCallbackNotes(id, val) {
+  var cbs = loadCallbacks().map(function(c){ if(c.id===id) c.notes=val; return c; });
+  saveCallbacks(cbs);
+}
+
+function clearDoneCallbacks() {
+  var cbs = loadCallbacks().filter(function(c){ return !c.done; });
+  saveCallbacks(cbs);
+  renderCallbackPanel();
 }
 
 // ── History panel ────────────────────────────────────────────
 function renderHistoryPanel() {
   var h = loadHistory();
   var card = document.getElementById('historyCard');
-  if (!h.length) { card.style.display = 'none'; return; }
+  if (!h.length) { card.style.display='none'; return; }
   card.style.display = 'block';
-
-  var list = document.getElementById('historyList');
-  list.innerHTML = h.map(function(entry){
+  document.getElementById('historyList').innerHTML = h.map(function(entry){
     return '<div class="history-item" onclick="loadHistoryEntry('+entry.id+')">'
-      +'<div class="history-item-info">'
-      +'<div class="history-item-title">'+esc(entry.query)+'</div>'
-      +'<div class="history-item-meta">'+esc(entry.date)+' &nbsp;·&nbsp; scanned '+entry.scanned+' businesses</div>'
-      +'</div>'
+      +'<div><div class="history-item-title">'+esc(entry.query)+'</div><div class="history-item-meta">'+esc(entry.date)+' · scanned '+entry.scanned+'</div></div>'
       +'<div class="history-item-stats">'
       +'<span class="history-badge">'+entry.leads.length+' leads</span>'
       +'<button class="btn-danger" onclick="event.stopPropagation();deleteHistoryEntry('+entry.id+')">✕</button>'
-      +'</div>'
-      +'</div>';
+      +'</div></div>';
   }).join('');
 }
 
 function loadHistoryEntry(id) {
-  var h = loadHistory();
-  var entry = h.find(function(e){ return e.id === id; });
+  var entry = loadHistory().find(function(e){ return e.id===id; });
   if (!entry) return;
   currentResults = entry.leads.slice();
   currentScanned = entry.scanned;
@@ -413,8 +468,7 @@ function loadHistoryEntry(id) {
 }
 
 function deleteHistoryEntry(id) {
-  var h = loadHistory().filter(function(e){ return e.id !== id; });
-  saveHistory(h);
+  saveHistory(loadHistory().filter(function(e){ return e.id!==id; }));
   renderHistoryPanel();
 }
 
@@ -422,75 +476,61 @@ function clearAllHistory() {
   if (!confirm('Delete all search history?')) return;
   saveHistory([]);
   renderHistoryPanel();
-  document.getElementById('globalSearch').value = '';
-  document.getElementById('globalSearchResults').style.display = 'none';
+  document.getElementById('globalSearch').value='';
+  document.getElementById('globalSearchResults').style.display='none';
 }
 
-// ── Global search across all history ────────────────────────
-function digitsOnly(s) { return (s||'').replace(/\D/g,''); }
+// ── Global search ────────────────────────────────────────────
+function digitsOnly(s){ return (s||'').replace(/\D/g,''); }
 
 function renderGlobalSearch() {
   var raw = document.getElementById('globalSearch').value.trim();
   var q = raw.toLowerCase();
-  var qDigits = digitsOnly(raw); // strip spaces/+/- for phone matching
+  var qDigits = digitsOnly(raw);
   var resultsDiv = document.getElementById('globalSearchResults');
-  if (!q) { resultsDiv.style.display = 'none'; return; }
-
-  var h = loadHistory();
+  if (!q) { resultsDiv.style.display='none'; return; }
   var matches = [];
-  h.forEach(function(entry){
-    (entry.leads || []).forEach(function(r){
-      var phoneDigits = digitsOnly(r.phone);
-      // Match on: name, address, or phone (digits stripped on both sides)
-      var phoneMatch = qDigits.length >= 4 && phoneDigits.includes(qDigits);
-      if (r.name.toLowerCase().includes(q) || (r.address||'').toLowerCase().includes(q) || phoneMatch) {
-        var copy = Object.assign({}, r);
-        copy._searchLabel = entry.query;
-        matches.push(copy);
+  loadHistory().forEach(function(entry){
+    (entry.leads||[]).forEach(function(r){
+      var phoneMatch = qDigits.length>=4 && digitsOnly(r.phone).includes(qDigits);
+      if (r.name.toLowerCase().includes(q)||(r.address||'').toLowerCase().includes(q)||phoneMatch) {
+        var copy = Object.assign({},r); copy._searchLabel=entry.query; matches.push(copy);
       }
     });
   });
-
-  document.getElementById('globalSearchLabel').textContent = matches.length + ' result' + (matches.length !== 1 ? 's' : '') + ' across all searches';
+  document.getElementById('globalSearchLabel').textContent = matches.length+' result'+(matches.length!==1?'s':'')+' across all searches';
   var tbody = document.getElementById('globalSearchBody');
-  if (!matches.length) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">No matches found</td></tr>';
-  } else {
-    tbody.innerHTML = matches.map(function(r){ return buildRow(r, true); }).join('');
-  }
-  resultsDiv.style.display = 'block';
+  tbody.innerHTML = matches.length
+    ? matches.map(function(r){ return buildRow(r,true); }).join('')
+    : '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted);">No matches found</td></tr>';
+  resultsDiv.style.display='block';
 }
 
 // ── Export ───────────────────────────────────────────────────
 function exportCurrentCSV() {
   var filter = document.getElementById('filterInput').value.toLowerCase();
-  var filtered = currentResults.filter(function(r){
-    if (filter && !r.name.toLowerCase().includes(filter)) return false;
-    return true;
-  });
-  downloadCSV(filtered, 'leads');
+  downloadCSV(currentResults.filter(function(r){ return !filter||r.name.toLowerCase().includes(filter); }), 'leads');
 }
-
 function downloadCSV(rows, prefix) {
-  var q = function(s){ return '"'+(s||'').toString().replace(/"/g,'""')+'"'; };
-  var headers = ['Business Name','Phone','Address','Rating','Reviews','Google Maps'];
-  var csvRows = rows.map(function(r){ return [q(r.name),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)]; });
-  var csv = [headers.join(',')].concat(csvRows.map(function(r){ return r.join(','); })).join('\n');
-  var blob = new Blob([csv],{type:'text/csv'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a'); a.href=url; a.download=prefix+'-'+Date.now()+'.csv'; a.click();
+  var q=function(s){return'"'+(s||'').toString().replace(/"/g,'""')+'"';};
+  var headers=['Business Name','Phone','Address','Rating','Reviews','Google Maps'];
+  var csv=[headers.join(',')].concat(rows.map(function(r){return[q(r.name),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)].join(',');})).join('\n');
+  var blob=new Blob([csv],{type:'text/csv'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=prefix+'-'+Date.now()+'.csv';a.click();
   URL.revokeObjectURL(url);
 }
 
 // ── Helpers ──────────────────────────────────────────────────
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function showLoading(msg){ document.getElementById('statusText').textContent=msg; document.getElementById('statusLoading').style.display='flex'; }
-function setStatus(msg){ document.getElementById('statusText').textContent=msg; }
-function hideLoading(){ document.getElementById('statusLoading').style.display='none'; }
-function showError(msg){ hideLoading(); var el=document.getElementById('statusError'); el.textContent='⚠ '+msg; el.style.display='block'; }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showLoading(msg){document.getElementById('statusText').textContent=msg;document.getElementById('statusLoading').style.display='flex';}
+function setStatus(msg){document.getElementById('statusText').textContent=msg;}
+function hideLoading(){document.getElementById('statusLoading').style.display='none';}
+function showError(msg){hideLoading();var el=document.getElementById('statusError');el.textContent='⚠ '+msg;el.style.display='block';}
 
-// Init — show history on load
+// Init
 renderHistoryPanel();
+renderCallbackPanel();
 </script>
 </body>
 </html>
