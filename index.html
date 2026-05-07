@@ -80,10 +80,9 @@
   <div class="card">
     <div class="card-title">Configuration</div>
     <div class="api-note">
-      Requires a Google API key with these enabled in
-      <a href="https://console.cloud.google.com/apis/library" target="_blank">Google Cloud Console</a>:<br>
-      ✅ <strong>Places API (New)</strong> &nbsp;&nbsp; ✅ <strong>Geocoding API</strong><br>
-      Billing must be activated on your project (free tier covers thousands of searches/month).
+      Requires a Google API key with <strong>Places API (New)</strong> and <strong>Geocoding API</strong> enabled in
+      <a href="https://console.cloud.google.com/apis/library" target="_blank">Google Cloud Console</a>.
+      Billing must be active (free tier is generous).
     </div>
     <div class="form-grid">
       <div class="form-group" style="grid-column:1/-1;">
@@ -97,22 +96,30 @@
       <div class="form-group">
         <label>Business Type</label>
         <select id="bizType">
+          <!-- Values are exact Google Places API (New) type strings from Table A -->
           <option value="bakery">Bakery / Cake Shop</option>
           <option value="restaurant" selected>Restaurant</option>
           <option value="cafe">Cafe / Coffee Shop</option>
-          <option value="hair_salon">Hair Salon</option>
+          <option value="coffee_shop">Coffee Shop</option>
+          <option value="hair_care">Hair Salon</option>
           <option value="beauty_salon">Beauty Salon</option>
+          <option value="nail_salon">Nail Bar</option>
           <option value="clothing_store">Clothing / Boutique</option>
           <option value="florist">Florist</option>
           <option value="gym">Gym / Fitness</option>
           <option value="dentist">Dentist</option>
           <option value="plumber">Plumber</option>
           <option value="electrician">Electrician</option>
-          <option value="laundry">Laundry / Dry Cleaner</option>
+          <option value="laundry">Laundry</option>
+          <option value="dry_cleaning">Dry Cleaner</option>
           <option value="pet_store">Pet Shop</option>
-          <option value="car_repair">Auto Repair / Garage</option>
+          <option value="auto_repair">Auto Repair / Garage</option>
           <option value="bar">Bar / Pub</option>
           <option value="accounting">Accountant</option>
+          <option value="pizza_restaurant">Pizza Restaurant</option>
+          <option value="chinese_restaurant">Chinese Restaurant</option>
+          <option value="indian_restaurant">Indian Restaurant</option>
+          <option value="turkish_restaurant">Turkish Restaurant</option>
         </select>
       </div>
       <div class="form-group">
@@ -180,55 +187,29 @@
 <script>
 var allResults = [];
 
-// Geocode a place name to lat/lng
 async function geocode(address, apiKey) {
-  var url = 'https://maps.googleapis.com/maps/api/geocode/json?address='
-    + encodeURIComponent(address) + '&key=' + apiKey;
+  var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(address) + '&key=' + apiKey;
   var r = await fetch(url);
   var d = await r.json();
-  if (d.status === 'REQUEST_DENIED') {
-    throw new Error('Geocoding API not enabled or key is wrong. Error: ' + (d.error_message || d.status));
-  }
-  if (d.status !== 'OK' || !d.results || !d.results.length) {
-    throw new Error('Location not found: "' + address + '". Try "London, UK" or "Manchester, UK".');
-  }
-  return d.results[0].geometry.location; // { lat, lng }
+  if (d.status === 'REQUEST_DENIED') throw new Error('Geocoding API error: ' + (d.error_message || 'not enabled'));
+  if (d.status !== 'OK' || !d.results || !d.results.length) throw new Error('Location not found: "' + address + '"');
+  return d.results[0].geometry.location;
 }
 
-// Search nearby using Places API (New)
 async function searchNearby(lat, lng, type, radius, apiKey, pageToken) {
   var body = {
     locationRestriction: {
       circle: {
-        center: {
-          latitude: parseFloat(lat),
-          longitude: parseFloat(lng)
-        },
+        center: { latitude: parseFloat(lat), longitude: parseFloat(lng) },
         radius: parseFloat(radius)
       }
     },
     includedTypes: [type],
-    maxResultCount: 20,
-    rankPreference: "DISTANCE"
+    maxResultCount: 20
   };
+  if (pageToken) body.pageToken = pageToken;
 
-  if (pageToken) {
-    body.pageToken = pageToken;
-  }
-
-  // Field mask — must include primaryType or types per API docs
-  var fieldMask = [
-    'places.id',
-    'places.displayName',
-    'places.formattedAddress',
-    'places.nationalPhoneNumber',
-    'places.websiteUri',
-    'places.rating',
-    'places.userRatingCount',
-    'places.primaryType',
-    'places.googleMapsUri',
-    'nextPageToken'
-  ].join(',');
+  var fieldMask = 'places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.primaryType,places.googleMapsUri,nextPageToken';
 
   var resp = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
     method: 'POST',
@@ -240,22 +221,14 @@ async function searchNearby(lat, lng, type, radius, apiKey, pageToken) {
     body: JSON.stringify(body)
   });
 
-  // Try to read error body for better messages
   var respText = await resp.text();
   var respJson = {};
   try { respJson = JSON.parse(respText); } catch(e) {}
 
   if (!resp.ok) {
-    var apiMsg = (respJson.error && respJson.error.message) || respText || ('HTTP ' + resp.status);
-    if (resp.status === 400) {
-      throw new Error('400 Bad Request: ' + apiMsg);
-    }
-    if (resp.status === 403) {
-      throw new Error('403 Forbidden — Places API (New) not enabled or billing not active.\nDetails: ' + apiMsg);
-    }
-    throw new Error('API Error ' + resp.status + ': ' + apiMsg);
+    var msg = (respJson.error && respJson.error.message) || respText || ('HTTP ' + resp.status);
+    throw new Error(resp.status + ' ' + (resp.statusText||'') + ': ' + msg);
   }
-
   return respJson;
 }
 
@@ -273,20 +246,18 @@ async function startSearch() {
   document.getElementById('statusError').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'none';
   allResults = [];
-  showLoading('Geocoding "' + location + '"...');
+  showLoading('Finding "' + location + '"...');
 
   try {
     var coords = await geocode(location, apiKey);
-    setStatus('Searching for ' + type.replace(/_/g,' ') + ' near ' + location + '...');
+    setStatus('Searching ' + type.replace(/_/g,' ') + ' near ' + location + '...');
 
     var places = [];
     var pageToken = null;
     var page = 0;
-
     do {
       var data = await searchNearby(coords.lat, coords.lng, type, radius, apiKey, pageToken);
-      var batch = data.places || [];
-      places = places.concat(batch);
+      places = places.concat(data.places || []);
       pageToken = data.nextPageToken || null;
       page++;
       if (pageToken && places.length < maxResults) {
@@ -295,12 +266,10 @@ async function startSearch() {
       }
     } while (pageToken && places.length < maxResults && page < 3);
 
-    // Deduplicate by id
     var seen = {};
-    places = places.filter(function(p) {
+    places = places.filter(function(p){
       if (!p.id || seen[p.id]) return false;
-      seen[p.id] = true;
-      return true;
+      seen[p.id] = true; return true;
     }).slice(0, maxResults);
 
     allResults = places.map(function(p) {
@@ -312,13 +281,12 @@ async function startSearch() {
         address: p.formattedAddress || null,
         rating: p.rating || null,
         ratingsTotal: p.userRatingCount || 0,
-        primaryType: p.primaryType || '',
+        primaryType: (p.primaryType || '').replace(/_/g,' '),
         mapsUrl: p.googleMapsUri || null
       };
     });
 
     renderResults(location, type);
-
   } catch(err) {
     showError(err.message || 'Something went wrong.');
   } finally {
@@ -355,9 +323,8 @@ function renderTable() {
   tbody.innerHTML = filtered.map(function(r) {
     var sc = r.rating ? Math.round(r.rating) : 0;
     var stars = '★'.repeat(sc) + '☆'.repeat(5-sc);
-    var typeLabel = (r.primaryType || '').replace(/_/g,' ');
     return '<tr>'
-      +'<td><div class="biz-name">'+esc(r.name)+'</div><div class="biz-type">'+esc(typeLabel)+'</div></td>'
+      +'<td><div class="biz-name">'+esc(r.name)+'</div><div class="biz-type">'+esc(r.primaryType)+'</div></td>'
       +'<td>'+(r.hasWebsite?'<span class="badge-yes">Has website</span>':'<span class="badge-no">No website</span>')+'</td>'
       +'<td>'+(r.rating?'<div class="stars">'+stars+'</div><div class="rating-count">'+r.rating+' ('+r.ratingsTotal+')</div>':'<span style="color:#555">—</span>')+'</td>'
       +'<td><span class="phone">'+esc(r.phone||'—')+'</span></td>'
@@ -371,12 +338,7 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function showLoading(msg){ document.getElementById('statusText').textContent=msg; document.getElementById('statusLoading').style.display='flex'; }
 function setStatus(msg){ document.getElementById('statusText').textContent=msg; }
 function hideLoading(){ document.getElementById('statusLoading').style.display='none'; }
-function showError(msg){
-  hideLoading();
-  var el=document.getElementById('statusError');
-  el.textContent='⚠ '+msg;
-  el.style.display='block';
-}
+function showError(msg){ hideLoading(); var el=document.getElementById('statusError'); el.textContent='⚠ '+msg; el.style.display='block'; }
 
 function exportCSV() {
   var noWebsiteOnly = document.getElementById('noWebsiteOnly').checked;
@@ -388,9 +350,7 @@ function exportCSV() {
   });
   var q = function(s){ return '"'+(s||'').toString().replace(/"/g,'""')+'"'; };
   var headers = ['Business Name','Has Website','Website URL','Phone','Address','Rating','Reviews','Google Maps'];
-  var rows = filtered.map(function(r){
-    return [q(r.name),r.hasWebsite?'Yes':'No',q(r.website),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)];
-  });
+  var rows = filtered.map(function(r){ return [q(r.name),r.hasWebsite?'Yes':'No',q(r.website),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)]; });
   var csv = [headers.join(',')].concat(rows.map(function(r){ return r.join(','); })).join('\n');
   var blob = new Blob([csv],{type:'text/csv'});
   var url = URL.createObjectURL(blob);
