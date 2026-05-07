@@ -91,35 +91,33 @@
       </div>
       <div class="form-group">
         <label>Location</label>
-        <input type="text" id="location" placeholder="e.g. London, UK" value="London, UK">
+        <input type="text" id="location" placeholder="e.g. Shoreditch, London" value="London, UK">
       </div>
       <div class="form-group">
         <label>Business Type</label>
         <select id="bizType">
-          <!-- Values are exact Google Places API (New) type strings from Table A -->
           <option value="bakery">Bakery / Cake Shop</option>
           <option value="restaurant" selected>Restaurant</option>
           <option value="cafe">Cafe / Coffee Shop</option>
-          <option value="coffee_shop">Coffee Shop</option>
-          <option value="hair_care">Hair Salon</option>
-          <option value="beauty_salon">Beauty Salon</option>
-          <option value="nail_salon">Nail Bar</option>
-          <option value="clothing_store">Clothing / Boutique</option>
+          <option value="hair salon">Hair Salon</option>
+          <option value="beauty salon">Beauty Salon</option>
+          <option value="nail salon">Nail Bar</option>
+          <option value="clothing store">Clothing / Boutique</option>
           <option value="florist">Florist</option>
           <option value="gym">Gym / Fitness</option>
           <option value="dentist">Dentist</option>
           <option value="plumber">Plumber</option>
           <option value="electrician">Electrician</option>
-          <option value="laundry">Laundry</option>
-          <option value="dry_cleaning">Dry Cleaner</option>
-          <option value="pet_store">Pet Shop</option>
-          <option value="auto_repair">Auto Repair / Garage</option>
-          <option value="bar">Bar / Pub</option>
-          <option value="accounting">Accountant</option>
-          <option value="pizza_restaurant">Pizza Restaurant</option>
-          <option value="chinese_restaurant">Chinese Restaurant</option>
-          <option value="indian_restaurant">Indian Restaurant</option>
-          <option value="turkish_restaurant">Turkish Restaurant</option>
+          <option value="laundry">Laundry / Dry Cleaner</option>
+          <option value="pet shop">Pet Shop</option>
+          <option value="car repair garage">Auto Repair / Garage</option>
+          <option value="bar pub">Bar / Pub</option>
+          <option value="accountant">Accountant</option>
+          <option value="pizza restaurant">Pizza Restaurant</option>
+          <option value="indian restaurant">Indian Restaurant</option>
+          <option value="chinese restaurant">Chinese Restaurant</option>
+          <option value="turkish restaurant">Turkish Restaurant</option>
+          <option value="takeaway">Takeaway</option>
         </select>
       </div>
       <div class="form-group">
@@ -187,31 +185,14 @@
 <script>
 var allResults = [];
 
-async function geocode(address, apiKey) {
-  var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(address) + '&key=' + apiKey;
-  var r = await fetch(url);
-  var d = await r.json();
-  if (d.status === 'REQUEST_DENIED') throw new Error('Geocoding API error: ' + (d.error_message || 'not enabled'));
-  if (d.status !== 'OK' || !d.results || !d.results.length) throw new Error('Location not found: "' + address + '"');
-  return d.results[0].geometry.location;
-}
-
-async function searchNearby(lat, lng, type, radius, apiKey, pageToken) {
-  var body = {
-    locationRestriction: {
-      circle: {
-        center: { latitude: parseFloat(lat), longitude: parseFloat(lng) },
-        radius: parseFloat(radius)
-      }
-    },
-    includedTypes: [type],
-    maxResultCount: 20
-  };
+// Uses Text Search (New) — no strict type names needed, just natural language like "restaurants in London"
+async function textSearch(query, apiKey, pageToken) {
+  var body = { textQuery: query };
   if (pageToken) body.pageToken = pageToken;
 
   var fieldMask = 'places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.primaryType,places.googleMapsUri,nextPageToken';
 
-  var resp = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+  var resp = await fetch('https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -227,7 +208,7 @@ async function searchNearby(lat, lng, type, radius, apiKey, pageToken) {
 
   if (!resp.ok) {
     var msg = (respJson.error && respJson.error.message) || respText || ('HTTP ' + resp.status);
-    throw new Error(resp.status + ' ' + (resp.statusText||'') + ': ' + msg);
+    throw new Error(resp.status + ': ' + msg);
   }
   return respJson;
 }
@@ -236,7 +217,6 @@ async function startSearch() {
   var apiKey = document.getElementById('apiKey').value.trim();
   var location = document.getElementById('location').value.trim();
   var type = document.getElementById('bizType').value;
-  var radius = document.getElementById('radius').value;
   var maxResults = parseInt(document.getElementById('maxResults').value);
 
   if (!apiKey) { showError('Please enter your Google API key.'); return; }
@@ -246,17 +226,18 @@ async function startSearch() {
   document.getElementById('statusError').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'none';
   allResults = [];
-  showLoading('Finding "' + location + '"...');
+
+  // Build natural language query e.g. "restaurants in Shoreditch London"
+  var query = type + ' in ' + location;
+  showLoading('Searching for ' + query + '...');
 
   try {
-    var coords = await geocode(location, apiKey);
-    setStatus('Searching ' + type.replace(/_/g,' ') + ' near ' + location + '...');
-
     var places = [];
     var pageToken = null;
     var page = 0;
+
     do {
-      var data = await searchNearby(coords.lat, coords.lng, type, radius, apiKey, pageToken);
+      var data = await textSearch(query, apiKey, pageToken);
       places = places.concat(data.places || []);
       pageToken = data.nextPageToken || null;
       page++;
@@ -266,11 +247,17 @@ async function startSearch() {
       }
     } while (pageToken && places.length < maxResults && page < 3);
 
+    // Deduplicate
     var seen = {};
     places = places.filter(function(p){
       if (!p.id || seen[p.id]) return false;
       seen[p.id] = true; return true;
     }).slice(0, maxResults);
+
+    if (!places.length) {
+      showError('No results found for "' + query + '". Try a different location or business type.');
+      return;
+    }
 
     allResults = places.map(function(p) {
       return {
@@ -301,7 +288,7 @@ function renderResults(location, type) {
   document.getElementById('noWebsiteCount').textContent = noWebsite.length;
   var pct = allResults.length ? Math.round(noWebsite.length / allResults.length * 100) : 0;
   document.getElementById('opportunityRate').textContent = pct + '%';
-  document.getElementById('resultsTitle').textContent = type.replace(/_/g,' ') + ' near ' + location;
+  document.getElementById('resultsTitle').textContent = type + ' in ' + location;
   document.getElementById('resultsSection').style.display = 'block';
   renderTable();
   window.scrollTo({top: document.getElementById('resultsSection').offsetTop - 20, behavior:'smooth'});
@@ -317,7 +304,7 @@ function renderTable() {
   });
   var tbody = document.getElementById('resultsBody');
   if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">No results match filters</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted);">No results match your filters</td></tr>';
     return;
   }
   tbody.innerHTML = filtered.map(function(r) {
