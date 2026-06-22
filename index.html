@@ -9,7 +9,7 @@
   :root{--bg:#0d0d0d;--surface:#161616;--surface2:#1f1f1f;--border:#2a2a2a;--accent:#b8ff57;--accent2:#57d4ff;--danger:#ff5757;--text:#f0f0f0;--muted:#888;--radius:10px;--orange:#ffaa57;}
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'DM Mono',monospace;min-height:100vh;padding:40px 24px;}
-  .container{max-width:960px;margin:0 auto;}
+  .container{max-width:980px;margin:0 auto;}
   header{margin-bottom:40px;}
   .tag{display:inline-block;background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:4px;margin-bottom:16px;}
   h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5vw,46px);font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:10px;}
@@ -22,28 +22,30 @@
   .card-title-left.orange::before{background:var(--orange);}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
   .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group.full{grid-column:1/-1;}
   label{font-size:11px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;}
+  label .hint{text-transform:none;letter-spacing:0;color:#555;font-size:10px;}
   input,select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:13px;padding:10px 14px;outline:none;transition:border-color .15s;width:100%;}
   input:focus,select:focus,textarea:focus{border-color:var(--accent);}
   input::placeholder,textarea::placeholder{color:#444;}
   select option{background:#1f1f1f;}
-  textarea{resize:vertical;min-height:60px;line-height:1.6;}
+  textarea{resize:vertical;min-height:90px;line-height:1.7;}
   .api-note{background:rgba(184,255,87,.06);border:1px solid rgba(184,255,87,.2);border-radius:6px;padding:12px 16px;font-size:11px;color:#aaa;margin-bottom:14px;line-height:1.9;}
   .api-note a{color:var(--accent);text-decoration:none;}
   .api-note strong{color:var(--accent);}
   .tip{background:rgba(87,212,255,.05);border:1px solid rgba(87,212,255,.15);border-radius:6px;padding:12px 16px;font-size:11px;color:#aaa;margin-bottom:14px;line-height:1.9;}
   .tip strong{color:var(--accent2);}
+  .checkbox-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#bbb;margin-bottom:14px;cursor:pointer;user-select:none;}
+  .checkbox-row input{width:auto;accent-color:var(--accent);cursor:pointer;}
   .btn{background:var(--accent);color:#000;border:none;border-radius:6px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:12px 28px;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.04em;}
   .btn:hover{opacity:.88;}.btn:active{transform:scale(.98);}.btn:disabled{opacity:.4;cursor:not-allowed;}
   .btn-secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:6px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;cursor:pointer;transition:background .15s;}
   .btn-secondary:hover{background:rgba(184,255,87,.08);}
   .btn-danger{background:transparent;color:#ff8080;border:1px solid rgba(255,87,87,.3);border-radius:6px;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:6px 14px;cursor:pointer;transition:background .15s;}
   .btn-danger:hover{background:rgba(255,87,87,.08);}
-  /* Callback button */
   .btn-callback{background:transparent;color:var(--orange);border:1px solid rgba(255,170,87,.35);border-radius:6px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;transition:background .15s;white-space:nowrap;letter-spacing:.03em;}
   .btn-callback:hover{background:rgba(255,170,87,.1);}
   .btn-callback.added{background:rgba(255,170,87,.15);color:var(--orange);border-color:var(--orange);}
-  /* Done button */
   .btn-done{background:transparent;color:#a0cc50;border:1px solid rgba(184,255,87,.3);border-radius:6px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;transition:background .15s;white-space:nowrap;}
   .btn-done:hover{background:rgba(184,255,87,.08);}
   .btn-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
@@ -51,10 +53,13 @@
   .status-bar.loading{display:flex;align-items:center;gap:10px;background:rgba(87,212,255,.08);border:1px solid rgba(87,212,255,.2);color:var(--accent2);}
   .spinner{width:14px;height:14px;border:2px solid rgba(87,212,255,.3);border-top-color:var(--accent2);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+  .progress-wrap{width:100%;}
+  .progress-bar-bg{width:100%;height:4px;background:var(--surface2);border-radius:2px;margin-top:8px;overflow:hidden;}
+  .progress-bar-fill{height:4px;background:var(--accent2);border-radius:2px;transition:width .3s;width:0%;}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
   .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
-  .stat-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);line-height:1;}
-  .stat-label{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:4px;}
+  .stat-value{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--accent);line-height:1;}
+  .stat-label{font-size:10px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:4px;}
   table{width:100%;border-collapse:collapse;font-size:12px;}
   thead th{text-align:left;padding:10px 14px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border);}
   tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
@@ -62,21 +67,22 @@
   tbody td{padding:10px 14px;vertical-align:middle;line-height:1.5;}
   .biz-name{font-family:'Syne',sans-serif;font-weight:600;font-size:13px;color:var(--text);margin-bottom:2px;}
   .biz-type{font-size:10px;color:var(--muted);}
+  .biz-area{font-size:10px;color:var(--accent2);margin-top:1px;}
   .stars{color:#ffc857;font-size:11px;}
   .rating-count{color:var(--muted);font-size:10px;}
-  .phone{color:var(--accent2);font-size:11px;}
-  .address-text{color:#aaa;font-size:11px;max-width:160px;line-height:1.5;}
+  .phone{color:var(--accent2);font-size:11px;text-decoration:none;}
+  .phone:hover{text-decoration:underline;}
+  .address-text{color:#aaa;font-size:11px;max-width:150px;line-height:1.5;}
   .maps-link{color:var(--accent);text-decoration:none;font-size:11px;}
   .maps-link:hover{text-decoration:underline;}
   .results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
   .results-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
   .filter-bar{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap;}
-  .filter-bar input{flex:1;max-width:300px;}
+  .filter-bar input,.filter-bar select{flex:1;max-width:220px;}
   .no-results-tip{text-align:center;padding:40px 20px;color:var(--muted);}
   .no-results-tip h3{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;}
   .no-results-tip p{font-size:11px;line-height:1.8;}
   .no-results-tip strong{color:var(--accent2);}
-  /* Callback list */
   .callback-list{display:flex;flex-direction:column;gap:12px;}
   .callback-item{background:var(--surface2);border:1px solid rgba(255,170,87,.2);border-radius:8px;padding:16px 18px;}
   .callback-item.done-item{border-color:rgba(184,255,87,.15);opacity:.6;}
@@ -91,7 +97,6 @@
   .cb-notes::placeholder{color:#555;}
   .done-badge{display:inline-block;background:rgba(184,255,87,.1);color:#a0cc50;border:1px solid rgba(184,255,87,.2);border-radius:4px;font-size:10px;padding:2px 8px;font-weight:600;}
   .empty-cb{text-align:center;padding:30px;color:var(--muted);font-size:12px;line-height:1.8;}
-  /* History */
   .history-list{display:flex;flex-direction:column;gap:10px;}
   .history-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s;}
   .history-item:hover{border-color:rgba(184,255,87,.3);}
@@ -101,6 +106,7 @@
   .history-badge{background:rgba(255,87,87,.12);color:#ff8080;border:1px solid rgba(255,87,87,.2);border-radius:4px;font-size:11px;font-weight:600;padding:3px 10px;white-space:nowrap;}
   .global-search-wrap{margin-bottom:16px;}
   .global-search-wrap input{width:100%;font-size:13px;}
+  .area-progress{font-size:10px;color:var(--muted);margin-top:6px;}
   @media(max-width:600px){.form-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}.history-item{flex-direction:column;align-items:flex-start;}.cb-top{flex-direction:column;}}
 </style>
 </head>
@@ -121,25 +127,23 @@
       <a href="https://console.cloud.google.com/apis/library" target="_blank">Google Cloud Console</a>.
     </div>
     <div class="tip">
-      💡 <strong>Pro tip:</strong> Search specific neighbourhoods — e.g. <strong>"Peckham, London"</strong>, <strong>"Hackney, London"</strong>. Independent local businesses are far more likely to have no website than chains in city centres.
+      💡 <strong>Batch mode:</strong> paste multiple areas, one per line, to scan them all automatically in one go — leads are combined into a single deduplicated list.
     </div>
     <div class="form-grid">
-      <div class="form-group" style="grid-column:1/-1;">
+      <div class="form-group full">
         <label>Google API Key</label>
         <input type="password" id="apiKey" placeholder="AIzaSy..." autocomplete="off">
       </div>
-      <div class="form-group">
-        <label>Neighbourhood / Area</label>
-        <input type="text" id="location" placeholder="e.g. Peckham, London" value="Peckham, London">
+      <div class="form-group full">
+        <label>Neighbourhood(s) / Area(s) <span class="hint">— one per line for batch search</span></label>
+        <textarea id="location" placeholder="Peckham, London
+Hackney, London
+Dalston, London">Peckham, London</textarea>
       </div>
       <div class="form-group">
         <label>Business Type</label>
         <select id="bizType">
           <option value="bakery">Bakery / Cake Shop</option>
-          <option value="hotel">Hotel</option>
-          <option value="solicitor">Solicitor / Lawyer</option>
-          <option value="letting agency">Letting Agency</option>
-          <option value="airbnb">Airbnb</option>
           <option value="restaurant" selected>Restaurant</option>
           <option value="cafe">Cafe / Coffee Shop</option>
           <option value="hair salon">Hair Salon</option>
@@ -162,35 +166,48 @@
           <option value="chinese restaurant">Chinese Restaurant</option>
           <option value="turkish restaurant">Turkish Restaurant</option>
           <option value="pizza restaurant">Pizza Restaurant</option>
+          <option value="hotel">Hotel</option>
+          <option value="letting agency">Letting Agency</option>
+          <option value="airbnb">Airbnb</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Target Leads (no website)</label>
+        <label>Target Leads <span class="hint">— per area</span></label>
         <select id="maxResults">
           <option value="5">5 leads</option>
           <option value="10" selected>10 leads</option>
           <option value="20">20 leads</option>
           <option value="30">30 leads</option>
           <option value="50">50 leads</option>
-          <option value="100">100 leads</option>
         </select>
       </div>
     </div>
+    <label class="checkbox-row">
+      <input type="checkbox" id="excludeJunk" checked>
+      Exclude fast food, takeaways &amp; chicken shops (keeps proper sit-down restaurants only)
+    </label>
     <div class="btn-row">
       <button class="btn" id="searchBtn" onclick="startSearch()">Find Leads →</button>
     </div>
   </div>
 
   <div class="status-bar loading" id="statusLoading">
-    <div class="spinner"></div>
-    <span id="statusText">Searching...</span>
+    <div class="progress-wrap">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="spinner"></div>
+        <span id="statusText">Searching...</span>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
+      <div class="area-progress" id="areaProgress"></div>
+    </div>
   </div>
   <div id="statusError" style="display:none;padding:14px 16px;border-radius:6px;font-size:12px;margin-bottom:20px;background:rgba(255,87,87,.08);border:1px solid rgba(255,87,87,.2);color:#ff5757;white-space:pre-wrap;word-break:break-word;"></div>
 
   <!-- Current Results -->
   <div id="resultsSection" style="display:none;">
     <div class="stats-row">
-      <div class="stat"><div class="stat-value" id="totalScanned">0</div><div class="stat-label">Scanned</div></div>
+      <div class="stat"><div class="stat-value" id="areasScanned">0</div><div class="stat-label">Areas Scanned</div></div>
+      <div class="stat"><div class="stat-value" id="totalScanned">0</div><div class="stat-label">Businesses Scanned</div></div>
       <div class="stat"><div class="stat-value" id="noWebsiteCount" style="color:#ff8080;">0</div><div class="stat-label">No Website 🎯</div></div>
       <div class="stat"><div class="stat-value" id="opportunityRate">0%</div><div class="stat-label">Opportunity Rate</div></div>
     </div>
@@ -201,17 +218,23 @@
       </div>
       <div class="filter-bar">
         <input type="text" id="filterInput" placeholder="Filter by name or address..." oninput="renderTable()">
+        <select id="sortSelect" onchange="renderTable()">
+          <option value="default">Sort: Default</option>
+          <option value="rating_desc">Sort: Rating (high→low)</option>
+          <option value="reviews_desc">Sort: Most reviewed</option>
+          <option value="name_asc">Sort: Name (A→Z)</option>
+        </select>
       </div>
       <div style="overflow-x:auto;">
         <table>
-          <thead><tr><th>Business</th><th>Rating</th><th>Phone</th><th>Address</th><th>Maps</th><th>Action</th></tr></thead>
+          <thead><tr id="tableHeadRow"><th>Business</th><th>Rating</th><th>Phone</th><th>Address</th><th>Maps</th><th>Action</th></tr></thead>
           <tbody id="resultsBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- ★ CALLBACK LIST ★ -->
+  <!-- Callback List -->
   <div class="card" id="callbackCard" style="display:none;">
     <div class="card-title">
       <span class="card-title-left orange">📞 Call Back List <span id="callbackCountBadge" style="background:rgba(255,170,87,.2);color:var(--orange);border-radius:4px;padding:2px 8px;font-size:11px;margin-left:6px;">0</span></span>
@@ -248,14 +271,19 @@
 <script>
 var currentResults = [];
 var currentScanned = 0;
+var currentAreasUsed = [];
 var HISTORY_KEY = 'wgf_history_v1';
 var CALLBACK_KEY = 'wgf_callbacks_v1';
 
+// Types Google tags as junk for "proper restaurant" searches
+var JUNK_TYPES = ['fast_food_restaurant','meal_takeaway','meal_delivery'];
+var JUNK_KEYWORDS = ['chicken','fried chicken','peri peri','peri-peri','kfc'];
+
 // ── Storage ──────────────────────────────────────────────────
-function loadHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch(e) { return []; } }
-function saveHistory(h) { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch(e) {} }
-function loadCallbacks() { try { return JSON.parse(localStorage.getItem(CALLBACK_KEY)) || []; } catch(e) { return []; } }
-function saveCallbacks(c) { try { localStorage.setItem(CALLBACK_KEY, JSON.stringify(c)); } catch(e) {} }
+function loadHistory(){ try{ return JSON.parse(localStorage.getItem(HISTORY_KEY))||[]; }catch(e){ return []; } }
+function saveHistory(h){ try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }catch(e){} }
+function loadCallbacks(){ try{ return JSON.parse(localStorage.getItem(CALLBACK_KEY))||[]; }catch(e){ return []; } }
+function saveCallbacks(c){ try{ localStorage.setItem(CALLBACK_KEY, JSON.stringify(c)); }catch(e){} }
 
 // ── API ──────────────────────────────────────────────────────
 async function textSearch(query, apiKey, pageToken) {
@@ -280,43 +308,100 @@ async function textSearch(query, apiKey, pageToken) {
   return respJson;
 }
 
-// ── Main search ──────────────────────────────────────────────
+function isJunk(p) {
+  if (JUNK_TYPES.indexOf(p.primaryType) !== -1) return true;
+  var name = ((p.displayName && p.displayName.text) || '').toLowerCase();
+  return JUNK_KEYWORDS.some(function(k){ return name.indexOf(k) !== -1; });
+}
+
+// ── Main batch search ────────────────────────────────────────
 async function startSearch() {
   var apiKey = document.getElementById('apiKey').value.trim();
-  var location = document.getElementById('location').value.trim();
+  var rawLocations = document.getElementById('location').value.trim();
   var type = document.getElementById('bizType').value;
-  var targetLeads = parseInt(document.getElementById('maxResults').value);
+  var targetPerArea = parseInt(document.getElementById('maxResults').value);
+  var excludeJunk = document.getElementById('excludeJunk').checked;
+
   if (!apiKey) { showError('Please enter your Google API key.'); return; }
-  if (!location) { showError('Please enter a location.'); return; }
+  if (!rawLocations) { showError('Please enter at least one location.'); return; }
+
+  var areas = rawLocations.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  if (!areas.length) { showError('Please enter at least one location.'); return; }
+
   document.getElementById('searchBtn').disabled = true;
   document.getElementById('statusError').style.display = 'none';
   document.getElementById('resultsSection').style.display = 'none';
-  currentResults = []; currentScanned = 0;
-  var query = type + ' in ' + location;
-  showLoading('Scanning ' + query + '...');
+  currentResults = []; currentScanned = 0; currentAreasUsed = areas.slice();
+
+  var seenGlobal = {}; // dedupe by place id AND phone across all areas
+  showLoading('Starting batch scan across ' + areas.length + ' area' + (areas.length>1?'s':'') + '...');
+  setProgress(0);
+
   try {
-    var pageToken = null, page = 0, seenIds = {}, maxPages = 10;
-    do {
-      var data = await textSearch(query, apiKey, pageToken);
-      var batch = data.places || [];
-      pageToken = data.nextPageToken || null; page++;
-      var fresh = batch.filter(function(p){ if(!p.id||seenIds[p.id])return false; seenIds[p.id]=true; return true; });
-      currentScanned += fresh.length;
-      var noSite = fresh.filter(function(p){ return !p.websiteUri; });
-      currentResults = currentResults.concat(noSite.map(function(p){
-        return { name:(p.displayName&&p.displayName.text)||'Unknown', phone:p.nationalPhoneNumber||null, address:p.formattedAddress||null, rating:p.rating||null, ratingsTotal:p.userRatingCount||0, primaryType:(p.primaryType||'').replace(/_/g,' '), mapsUrl:p.googleMapsUri||null };
-      }));
-      setStatus('Scanned '+currentScanned+' businesses, found '+currentResults.length+' without websites...');
-      if (currentResults.length >= targetLeads) break;
-      if (pageToken && page < maxPages) await new Promise(function(r){ setTimeout(r, 1500); });
-    } while (pageToken && page < maxPages && currentResults.length < targetLeads);
-    currentResults = currentResults.slice(0, targetLeads);
+    for (var ai = 0; ai < areas.length; ai++) {
+      var area = areas[ai];
+      var query = type + ' in ' + area;
+      var areaFound = 0;
+      var pageToken = null, page = 0, maxPages = 10;
+
+      do {
+        document.getElementById('areaProgress').textContent =
+          'Area ' + (ai+1) + '/' + areas.length + ': ' + area + ' — scanned ' + currentScanned + ', found ' + currentResults.length + ' leads so far';
+        setProgress(Math.round((ai / areas.length) * 100));
+
+        var data = await textSearch(query, apiKey, pageToken);
+        var batch = data.places || [];
+        pageToken = data.nextPageToken || null;
+        page++;
+
+        batch.forEach(function(p) {
+          var phoneKey = (p.nationalPhoneNumber || '').replace(/\D/g,'');
+          var key = p.id || (phoneKey + '|' + ((p.displayName&&p.displayName.text)||''));
+          if (seenGlobal[key]) return;
+          seenGlobal[key] = true;
+          currentScanned++;
+
+          if (p.websiteUri) return; // has website, skip
+          if (excludeJunk && isJunk(p)) return; // junk type, skip
+
+          currentResults.push({
+            name: (p.displayName && p.displayName.text) || 'Unknown',
+            phone: p.nationalPhoneNumber || null,
+            address: p.formattedAddress || null,
+            rating: p.rating || null,
+            ratingsTotal: p.userRatingCount || 0,
+            primaryType: (p.primaryType || '').replace(/_/g,' '),
+            mapsUrl: p.googleMapsUri || null,
+            area: area
+          });
+          areaFound++;
+        });
+
+        if (areaFound >= targetPerArea) break;
+        if (pageToken && page < maxPages) await new Promise(function(r){ setTimeout(r, 1500); });
+      } while (pageToken && page < maxPages && areaFound < targetPerArea);
+    }
+
+    setProgress(100);
+    document.getElementById('areaProgress').textContent = 'Done — scanned ' + areas.length + ' area' + (areas.length>1?'s':'');
+
     var history = loadHistory();
-    history.unshift({ id: Date.now(), query:query, type:type, location:location, date:new Date().toLocaleString('en-GB'), scanned:currentScanned, leads:currentResults.slice() });
+    history.unshift({
+      id: Date.now(),
+      query: type + (areas.length>1 ? ' across ' + areas.length + ' areas' : ' in ' + areas[0]),
+      type: type,
+      location: areas.join('; '),
+      areas: areas,
+      date: new Date().toLocaleString('en-GB'),
+      scanned: currentScanned,
+      leads: currentResults.slice()
+    });
     if (history.length > 50) history = history.slice(0, 50);
     saveHistory(history);
-    renderCurrentResults(location, type);
+
+    renderCurrentResults(areas, type);
     renderHistoryPanel();
+
   } catch(err) {
     showError(err.message || 'Something went wrong.');
   } finally {
@@ -326,125 +411,117 @@ async function startSearch() {
 }
 
 // ── Current results ──────────────────────────────────────────
-function renderCurrentResults(location, type) {
+function renderCurrentResults(areas, type) {
   var pct = currentScanned ? Math.round(currentResults.length / currentScanned * 100) : 0;
+  document.getElementById('areasScanned').textContent = areas.length;
   document.getElementById('totalScanned').textContent = currentScanned;
   document.getElementById('noWebsiteCount').textContent = currentResults.length;
   document.getElementById('opportunityRate').textContent = pct + '%';
-  document.getElementById('resultsTitle').textContent = currentResults.length + ' ' + type + ' leads in ' + location;
+  document.getElementById('resultsTitle').textContent = currentResults.length + ' ' + type + ' leads' + (areas.length>1 ? ' across ' + areas.length + ' areas' : ' in ' + areas[0]);
+
+  // Show Area column only for multi-area batches
+  var headRow = document.getElementById('tableHeadRow');
+  if (areas.length > 1) {
+    headRow.innerHTML = '<th>Business</th><th>Area</th><th>Rating</th><th>Phone</th><th>Address</th><th>Maps</th><th>Action</th>';
+  } else {
+    headRow.innerHTML = '<th>Business</th><th>Rating</th><th>Phone</th><th>Address</th><th>Maps</th><th>Action</th>';
+  }
+
   document.getElementById('resultsSection').style.display = 'block';
   renderTable();
   window.scrollTo({top: document.getElementById('resultsSection').offsetTop - 20, behavior:'smooth'});
 }
 
-function renderTable() {
+function getSortedFiltered(list) {
   var filter = document.getElementById('filterInput').value.toLowerCase();
-  var filtered = currentResults.filter(function(r){
+  var sortBy = document.getElementById('sortSelect').value;
+  var filtered = list.filter(function(r){
     if (filter && !r.name.toLowerCase().includes(filter) && !(r.address||'').toLowerCase().includes(filter)) return false;
     return true;
   });
-  var tbody = document.getElementById('resultsBody');
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="6"><div class="no-results-tip"><h3>No leads found in this area</h3><p>Try a more <strong>specific local neighbourhood</strong>.</p></div></td></tr>';
-    return;
-  }
-  tbody.innerHTML = filtered.map(function(r){ return buildRow(r, false); }).join('');
+  if (sortBy === 'rating_desc') filtered.sort(function(a,b){ return (b.rating||0)-(a.rating||0); });
+  else if (sortBy === 'reviews_desc') filtered.sort(function(a,b){ return (b.ratingsTotal||0)-(a.ratingsTotal||0); });
+  else if (sortBy === 'name_asc') filtered.sort(function(a,b){ return a.name.localeCompare(b.name); });
+  return filtered;
 }
 
-function buildRow(r, showSearch) {
+function renderTable() {
+  var filtered = getSortedFiltered(currentResults);
+  var showArea = currentAreasUsed.length > 1;
+  var tbody = document.getElementById('resultsBody');
+  if (!filtered.length) {
+    var colspan = showArea ? 7 : 6;
+    tbody.innerHTML = '<tr><td colspan="'+colspan+'"><div class="no-results-tip"><h3>No leads found</h3><p>Try a more <strong>specific local neighbourhood</strong>, or untick the junk filter.</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(function(r){ return buildRow(r, false, showArea); }).join('');
+}
+
+function buildRow(r, showSearch, showArea) {
   var sc = r.rating ? Math.round(r.rating) : 0;
   var stars = '★'.repeat(sc) + '☆'.repeat(5-sc);
   var cbState = isInCallbacks(r) ? ' added' : '';
   var cbLabel = isInCallbacks(r) ? '✓ Added' : '📞 Call Back';
-  var safeR = encodeURIComponent(JSON.stringify(r));
+  var phoneCell = r.phone ? '<a class="phone" href="tel:'+esc(r.phone.replace(/\s/g,''))+'">'+esc(r.phone)+'</a>' : '<span style="color:#555">—</span>';
   return '<tr>'
     +'<td><div class="biz-name">'+esc(r.name)+'</div><div class="biz-type">'+esc(r.primaryType||'')+'</div></td>'
+    +(showArea ? '<td><div class="biz-area">'+esc(r.area||'')+'</div></td>' : '')
     +(showSearch ? '<td><div class="biz-type" style="max-width:110px;color:var(--accent2);">'+esc(r._searchLabel||'')+'</div></td>' : '')
     +'<td>'+(r.rating?'<div class="stars">'+stars+'</div><div class="rating-count">'+r.rating+' ('+r.ratingsTotal+')</div>':'<span style="color:#555">—</span>')+'</td>'
-    +'<td><span class="phone">'+esc(r.phone||'—')+'</span></td>'
+    +'<td>'+phoneCell+'</td>'
     +'<td><div class="address-text">'+esc(r.address||'—')+'</div></td>'
     +'<td>'+(r.mapsUrl?'<a class="maps-link" href="'+r.mapsUrl+'" target="_blank">View ↗</a>':'—')+'</td>'
     +'<td><button class="btn-callback'+cbState+'" onclick="addCallback(\''+esc(r.name)+'\',\''+esc(r.phone||'')+'\',\''+esc(r.address||'')+'\',\''+esc(r.mapsUrl||'')+'\',this)">'+cbLabel+'</button></td>'
     +'</tr>';
 }
 
-// ── Callback functions ────────────────────────────────────────
+// ── Callback functions ───────────────────────────────────────
 function isInCallbacks(r) {
-  var cbs = loadCallbacks();
-  return cbs.some(function(c){ return c.name === r.name && c.phone === r.phone; });
+  return loadCallbacks().some(function(c){ return c.name===r.name && c.phone===r.phone; });
 }
-
 function addCallback(name, phone, address, mapsUrl, btn) {
-  if (btn && btn.classList.contains('added')) return; // already added
+  if (btn && btn.classList.contains('added')) return;
   var cbs = loadCallbacks();
-  // Check not duplicate
-  if (cbs.some(function(c){ return c.name === name && c.phone === phone; })) {
-    if (btn) { btn.textContent = '✓ Added'; btn.classList.add('added'); }
+  if (cbs.some(function(c){ return c.name===name && c.phone===phone; })) {
+    if (btn) { btn.textContent='✓ Added'; btn.classList.add('added'); }
     return;
   }
-  cbs.unshift({ id: Date.now(), name:name, phone:phone, address:address, mapsUrl:mapsUrl, notes:'', done:false, addedAt:new Date().toLocaleString('en-GB') });
+  cbs.unshift({ id:Date.now(), name:name, phone:phone, address:address, mapsUrl:mapsUrl, notes:'', done:false, addedAt:new Date().toLocaleString('en-GB') });
   saveCallbacks(cbs);
-  if (btn) { btn.textContent = '✓ Added'; btn.classList.add('added'); }
+  if (btn) { btn.textContent='✓ Added'; btn.classList.add('added'); }
   renderCallbackPanel();
 }
-
 function renderCallbackPanel() {
   var cbs = loadCallbacks();
-  var card = document.getElementById('callbackCard');
   var pending = cbs.filter(function(c){ return !c.done; });
   document.getElementById('callbackCountBadge').textContent = pending.length;
-  card.style.display = 'block';
-
+  document.getElementById('callbackCard').style.display = 'block';
   var list = document.getElementById('callbackList');
   if (!cbs.length) {
     list.innerHTML = '<div class="empty-cb">No callbacks yet.<br>Hit <strong style="color:var(--orange)">📞 Call Back</strong> on any lead to add them here.</div>';
     return;
   }
-
-  // Show pending first, then done
   var sorted = cbs.slice().sort(function(a,b){ return (a.done?1:0)-(b.done?1:0); });
   list.innerHTML = sorted.map(function(cb){
     return '<div class="callback-item'+(cb.done?' done-item':'')+'" id="cb-'+cb.id+'">'
-      +'<div class="cb-top">'
-      +'<div>'
+      +'<div class="cb-top"><div>'
       +'<div class="cb-name">'+esc(cb.name)+(cb.done?' <span class="done-badge">Done ✓</span>':'')+'</div>'
-      +(cb.phone?'<div class="cb-phone">📞 '+esc(cb.phone)+'</div>':'')
+      +(cb.phone?'<div class="cb-phone"><a class="phone" href="tel:'+esc(cb.phone.replace(/\s/g,''))+'">📞 '+esc(cb.phone)+'</a></div>':'')
       +(cb.address?'<div class="cb-address">'+esc(cb.address)+'</div>':'')
-      +'<div class="cb-added">Added '+esc(cb.addedAt)+'</div>'
-      +'</div>'
+      +'<div class="cb-added">Added '+esc(cb.addedAt)+'</div></div>'
       +'<div class="cb-actions">'
       +(cb.mapsUrl?'<a class="maps-link" href="'+esc(cb.mapsUrl)+'" target="_blank" style="font-size:12px;">Maps ↗</a>':'')
       +(!cb.done?'<button class="btn-done" onclick="markCallbackDone('+cb.id+')">✓ Done</button>':'')
       +'<button class="btn-danger" onclick="removeCallback('+cb.id+')">✕</button>'
-      +'</div>'
-      +'</div>'
+      +'</div></div>'
       +'<textarea class="cb-notes" placeholder="Add notes e.g. spoke to owner, call back Tuesday..." onchange="updateCallbackNotes('+cb.id+', this.value)">'+esc(cb.notes)+'</textarea>'
       +'</div>';
   }).join('');
 }
-
-function markCallbackDone(id) {
-  var cbs = loadCallbacks().map(function(c){ if(c.id===id) c.done=true; return c; });
-  saveCallbacks(cbs);
-  renderCallbackPanel();
-}
-
-function removeCallback(id) {
-  var cbs = loadCallbacks().filter(function(c){ return c.id !== id; });
-  saveCallbacks(cbs);
-  renderCallbackPanel();
-}
-
-function updateCallbackNotes(id, val) {
-  var cbs = loadCallbacks().map(function(c){ if(c.id===id) c.notes=val; return c; });
-  saveCallbacks(cbs);
-}
-
-function clearDoneCallbacks() {
-  var cbs = loadCallbacks().filter(function(c){ return !c.done; });
-  saveCallbacks(cbs);
-  renderCallbackPanel();
-}
+function markCallbackDone(id){ saveCallbacks(loadCallbacks().map(function(c){ if(c.id===id)c.done=true; return c; })); renderCallbackPanel(); }
+function removeCallback(id){ saveCallbacks(loadCallbacks().filter(function(c){ return c.id!==id; })); renderCallbackPanel(); }
+function updateCallbackNotes(id,val){ saveCallbacks(loadCallbacks().map(function(c){ if(c.id===id)c.notes=val; return c; })); }
+function clearDoneCallbacks(){ saveCallbacks(loadCallbacks().filter(function(c){ return !c.done; })); renderCallbackPanel(); }
 
 // ── History panel ────────────────────────────────────────────
 function renderHistoryPanel() {
@@ -461,32 +538,25 @@ function renderHistoryPanel() {
       +'</div></div>';
   }).join('');
 }
-
 function loadHistoryEntry(id) {
   var entry = loadHistory().find(function(e){ return e.id===id; });
   if (!entry) return;
   currentResults = entry.leads.slice();
   currentScanned = entry.scanned;
-  renderCurrentResults(entry.location, entry.type);
+  currentAreasUsed = entry.areas || [entry.location];
+  renderCurrentResults(currentAreasUsed, entry.type);
   document.getElementById('filterInput').value = '';
 }
-
-function deleteHistoryEntry(id) {
-  saveHistory(loadHistory().filter(function(e){ return e.id!==id; }));
-  renderHistoryPanel();
-}
-
+function deleteHistoryEntry(id){ saveHistory(loadHistory().filter(function(e){ return e.id!==id; })); renderHistoryPanel(); }
 function clearAllHistory() {
   if (!confirm('Delete all search history?')) return;
-  saveHistory([]);
-  renderHistoryPanel();
+  saveHistory([]); renderHistoryPanel();
   document.getElementById('globalSearch').value='';
   document.getElementById('globalSearchResults').style.display='none';
 }
 
 // ── Global search ────────────────────────────────────────────
 function digitsOnly(s){ return (s||'').replace(/\D/g,''); }
-
 function renderGlobalSearch() {
   var raw = document.getElementById('globalSearch').value.trim();
   var q = raw.toLowerCase();
@@ -505,20 +575,19 @@ function renderGlobalSearch() {
   document.getElementById('globalSearchLabel').textContent = matches.length+' result'+(matches.length!==1?'s':'')+' across all searches';
   var tbody = document.getElementById('globalSearchBody');
   tbody.innerHTML = matches.length
-    ? matches.map(function(r){ return buildRow(r,true); }).join('')
+    ? matches.map(function(r){ return buildRow(r,true,false); }).join('')
     : '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted);">No matches found</td></tr>';
   resultsDiv.style.display='block';
 }
 
 // ── Export ───────────────────────────────────────────────────
 function exportCurrentCSV() {
-  var filter = document.getElementById('filterInput').value.toLowerCase();
-  downloadCSV(currentResults.filter(function(r){ return !filter||r.name.toLowerCase().includes(filter); }), 'leads');
+  downloadCSV(getSortedFiltered(currentResults), 'leads');
 }
 function downloadCSV(rows, prefix) {
   var q=function(s){return'"'+(s||'').toString().replace(/"/g,'""')+'"';};
-  var headers=['Business Name','Phone','Address','Rating','Reviews','Google Maps'];
-  var csv=[headers.join(',')].concat(rows.map(function(r){return[q(r.name),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)].join(',');})).join('\n');
+  var headers=['Business Name','Area','Phone','Address','Rating','Reviews','Google Maps'];
+  var csv=[headers.join(',')].concat(rows.map(function(r){return[q(r.name),q(r.area),q(r.phone),q(r.address),r.rating||'',r.ratingsTotal||'',q(r.mapsUrl)].join(',');})).join('\n');
   var blob=new Blob([csv],{type:'text/csv'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');a.href=url;a.download=prefix+'-'+Date.now()+'.csv';a.click();
@@ -527,8 +596,9 @@ function downloadCSV(rows, prefix) {
 
 // ── Helpers ──────────────────────────────────────────────────
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showLoading(msg){document.getElementById('statusText').textContent=msg;document.getElementById('statusLoading').style.display='flex';}
+function showLoading(msg){document.getElementById('statusText').textContent=msg;document.getElementById('statusLoading').style.display='flex';document.getElementById('areaProgress').textContent='';}
 function setStatus(msg){document.getElementById('statusText').textContent=msg;}
+function setProgress(p){document.getElementById('progressBar').style.width=p+'%';}
 function hideLoading(){document.getElementById('statusLoading').style.display='none';}
 function showError(msg){hideLoading();var el=document.getElementById('statusError');el.textContent='⚠ '+msg;el.style.display='block';}
 
